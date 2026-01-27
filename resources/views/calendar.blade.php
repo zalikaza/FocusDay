@@ -10,7 +10,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="fw-bold text-dark mb-1">Kalender Rencana</h2>
-                    <p class="text-muted mb-0">Lihat semua rencana Anda dalam sebulan</p>
+                    <p class="text-muted mb-0">Lihat semua rencana Anda dalam sbulan</p>
                 </div>
                 <!-- Tombol Buka Form -->
                 <button class="btn btn-success btn-add-task shadow-sm" data-bs-toggle="modal" data-bs-target="#addTaskModal" onclick="resetFormState()">
