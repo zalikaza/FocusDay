@@ -805,6 +805,26 @@
         } else {
             emptyState.classList.add('d-none');
         }
+        
+        // Update sidebar badge secara realtime
+        updateSidebarBadge();
+    }
+    
+    function updateSidebarBadge() {
+        const sidebarBadge = document.getElementById('sidebarBadge');
+        if (!sidebarBadge) return;
+        
+        // Hitung task yang belum selesai (pending) = task di activeTasksList yang checkboxnya TIDAK di-check
+        const pendingTasks = document.querySelectorAll('#activeTasksList .task-item .task-checkbox:not(:checked)').length;
+        
+        if (pendingTasks > 0) {
+            // Tampilkan badge dengan jumlah pending tasks
+            sidebarBadge.textContent = pendingTasks;
+            sidebarBadge.style.display = '';
+        } else {
+            // Sembunyikan badge jika semua task sudah selesai
+            sidebarBadge.style.display = 'none';
+        }
     }
 
     function updateCompletedSectionVisibility() {
@@ -1149,6 +1169,9 @@
         submitBtn.disabled = true;
         setTimeout(() => { submitBtn.innerHTML = originalHTML; submitBtn.disabled = false; }, 2000);
         console.log('Task added:', taskData);
+        
+        // Update sidebar badge setelah menambah task baru
+        updateSidebarBadge();
     }
 
     // ========================

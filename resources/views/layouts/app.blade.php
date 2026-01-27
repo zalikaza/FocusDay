@@ -516,7 +516,7 @@
                                 </svg>
                             </span>
                             <span class="nav-text">Beranda</span>
-                            <span class="badge ms-auto" id="sidebarBadge">0</span>
+                            <span class="badge ms-auto" id="sidebarBadge" style="display: none;"></span>
                         </a>
                     </li>
                     
