@@ -440,6 +440,102 @@
             color: #cbd5e1;
         }
 
+        /* ===========================================
+           DARK MODE: CATEGORY BADGES & BUTTONS
+           Warna transparan untuk tampilan proper
+           =========================================== */
+        
+        /* Category Badges (di task list) */
+        html[data-theme="dark"] .category-badge.category-work,
+        html[data-theme="dark"] .category-work {
+            background-color: rgba(37, 99, 235, 0.2) !important;
+            color: #93c5fd !important;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        html[data-theme="dark"] .category-badge.category-learning,
+        html[data-theme="dark"] .category-learning {
+            background-color: rgba(16, 185, 129, 0.2) !important;
+            color: #6ee7b7 !important;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        html[data-theme="dark"] .category-badge.category-personal,
+        html[data-theme="dark"] .category-personal {
+            background-color: rgba(245, 158, 11, 0.2) !important;
+            color: #fcd34d !important;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        /* Category Buttons (di form modal) */
+        html[data-theme="dark"] .btn-category.btn-work {
+            background-color: rgba(37, 99, 235, 0.15) !important;
+            color: #93c5fd !important;
+            border-color: rgba(59, 130, 246, 0.3) !important;
+        }
+        
+        html[data-theme="dark"] .btn-category.btn-learning {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            color: #6ee7b7 !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+        }
+        
+        html[data-theme="dark"] .btn-category.btn-personal {
+            background-color: rgba(245, 158, 11, 0.15) !important;
+            color: #fcd34d !important;
+            border-color: rgba(245, 158, 11, 0.3) !important;
+        }
+        
+        /* Category Headers (di halaman Kategori) */
+        html[data-theme="dark"] .header-work {
+            background-color: rgba(37, 99, 235, 0.15) !important;
+            color: #93c5fd !important;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2) !important;
+        }
+        
+        html[data-theme="dark"] .header-learning {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            color: #6ee7b7 !important;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2) !important;
+        }
+        
+        html[data-theme="dark"] .header-personal {
+            background-color: rgba(245, 158, 11, 0.15) !important;
+            color: #fcd34d !important;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.2) !important;
+        }
+        
+        /* Category Count Badge (di header kategori) */
+        html[data-theme="dark"] .category-count {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: inherit !important;
+        }
+        
+        /* Additional category colors (purple, pink, gray) */
+        html[data-theme="dark"] .category-purple,
+        html[data-theme="dark"] .btn-category.btn-purple,
+        html[data-theme="dark"] .header-purple {
+            background-color: rgba(139, 92, 246, 0.15) !important;
+            color: #c4b5fd !important;
+            border-color: rgba(139, 92, 246, 0.3) !important;
+        }
+        
+        html[data-theme="dark"] .category-pink,
+        html[data-theme="dark"] .btn-category.btn-pink,
+        html[data-theme="dark"] .header-pink {
+            background-color: rgba(236, 72, 153, 0.15) !important;
+            color: #f9a8d4 !important;
+            border-color: rgba(236, 72, 153, 0.3) !important;
+        }
+        
+        html[data-theme="dark"] .category-gray,
+        html[data-theme="dark"] .btn-category.btn-gray,
+        html[data-theme="dark"] .header-gray {
+            background-color: rgba(107, 114, 128, 0.15) !important;
+            color: #d1d5db !important;
+            border-color: rgba(107, 114, 128, 0.3) !important;
+        }
+
         .btn-success {
             background-color: var(--primary-green);
             border-color: var(--primary-green);
@@ -689,6 +785,41 @@
             updateIcon();
         });
     }
+    
+    // ========================
+    // GLOBAL SIDEBAR BADGE LOGIC
+    // ========================
+    // Fungsi global untuk update sidebar badge dari localStorage
+    window.updateSidebarBadgeFromStorage = function() {
+        const sidebarBadge = document.getElementById('sidebarBadge');
+        if (!sidebarBadge) return;
+        
+        // Baca jumlah pending tasks dari localStorage
+        const pendingTasks = parseInt(localStorage.getItem('focusday.pendingTasks') || '0');
+        
+        if (pendingTasks > 0) {
+            sidebarBadge.textContent = pendingTasks;
+            sidebarBadge.style.display = '';
+        } else {
+            sidebarBadge.style.display = 'none';
+        }
+    };
+    
+    // Fungsi global untuk menyimpan jumlah pending tasks ke localStorage
+    window.savePendingTasksCount = function(count) {
+        localStorage.setItem('focusday.pendingTasks', count.toString());
+        window.updateSidebarBadgeFromStorage();
+    };
+    
+    // Panggil saat halaman dimuat untuk menampilkan badge dari localStorage
+    window.updateSidebarBadgeFromStorage();
+    
+    // Listen untuk perubahan localStorage dari tab/halaman lain
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'focusday.pendingTasks') {
+            window.updateSidebarBadgeFromStorage();
+        }
+    });
 });
     </script>
     

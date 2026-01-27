@@ -817,6 +817,14 @@
         // Hitung task yang belum selesai (pending) = task di activeTasksList yang checkboxnya TIDAK di-check
         const pendingTasks = document.querySelectorAll('#activeTasksList .task-item .task-checkbox:not(:checked)').length;
         
+        // Simpan ke localStorage agar bisa dibaca di halaman lain
+        if (typeof window.savePendingTasksCount === 'function') {
+            window.savePendingTasksCount(pendingTasks);
+        } else {
+            // Fallback jika fungsi global belum tersedia
+            localStorage.setItem('focusday.pendingTasks', pendingTasks.toString());
+        }
+        
         if (pendingTasks > 0) {
             // Tampilkan badge dengan jumlah pending tasks
             sidebarBadge.textContent = pendingTasks;

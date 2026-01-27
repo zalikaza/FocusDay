@@ -105,9 +105,14 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted small mb-3">Tindakan ini tidak dapat dibatalkan. Harap berhati-hati.</p>
-                    <button class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-trash me-2"></i>Hapus Semua Data Tugas
-                    </button>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash me-2"></i>Hapus Semua Data Tugas
+                        </button>
+                        <a href="{{ route('login') }}" class="btn btn-danger btn-sm">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
+                    </div>
                 </div>
             </div>
 

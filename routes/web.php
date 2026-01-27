@@ -46,3 +46,8 @@ Route::get('/categories', function () {
 Route::get('/settings', function () {
     return view('settings');
 })->name('settings');
+
+// Login Page - Halaman Login
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
