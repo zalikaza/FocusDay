@@ -54,6 +54,7 @@ Route::get('/', function (Request $request) {
                 'rencana.judul_tugas',
                 'rencana.waktu',
                 'rencana.tanggal',
+                'rencana.status',
                 'kategori.nama_kategori'
             )
             ->get();
@@ -70,6 +71,7 @@ Route::get('/', function (Request $request) {
                 'rencana.judul_tugas',
                 'rencana.waktu',
                 'rencana.tanggal',
+                'rencana.status',
                 'kategori.nama_kategori'
             )
             ->get();
@@ -97,6 +99,57 @@ Route::get('/calendar', function () {
 Route::get('/tasks', function () {
     return view('tasks.all');
 })->name('tasks.all');
+
+// Simpan rencana baru dari modal Tambah Rencana
+Route::post('/rencana', function (Request $request) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return response()->json(['message' => 'Unauthenticated'], 401);
+    }
+
+    $data = $request->validate([
+        'judul_tugas' => ['required', 'string'],
+        'kategori_id' => ['nullable', 'integer'],
+        'tanggal'     => ['required', 'date'],
+        'waktu'       => ['nullable', 'string'],
+        'catatan'     => ['nullable', 'string'],
+    ]);
+
+    DB::table('rencana')->insert([
+        'judul_tugas' => $data['judul_tugas'],
+        'kategori_id' => $data['kategori_id'] ?? null,
+        'tanggal'     => $data['tanggal'],
+        'waktu'       => $data['waktu'] ?? null,
+        'catatan'     => $data['catatan'] ?? null,
+        'user_id'     => $userId,
+    ]);
+
+    return response()->json(['success' => true]);
+})->name('rencana.store');
+
+// Update status rencana (selesai / null)
+Route::patch('/rencana/{id}/status', function (Request $request, $id) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return response()->json(['message' => 'Unauthenticated'], 401);
+    }
+
+    $status = $request->input('status');
+    if ($status !== null && $status !== 'selesai') {
+        return response()->json(['message' => 'Status tidak valid'], 422);
+    }
+
+    DB::table('rencana')
+        ->where('rencana_id', $id)
+        ->where('user_id', $userId)
+        ->update(['status' => $status]);
+
+    return response()->json(['success' => true]);
+})->name('rencana.updateStatus');
 
 // Categories Page - Kategori
 Route::get('/categories', function () {

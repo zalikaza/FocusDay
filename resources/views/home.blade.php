@@ -42,14 +42,15 @@
                                     $title = $task->judul_tugas;
                                     $timeText = $task->waktu;
                                     $categoryLabel = $task->nama_kategori;
+                                    $isCompleted = ($task->status === 'selesai');
                                 @endphp
                                 <div class="list-group-item border-0 px-0 py-3 rounded task-item" data-task-id="{{ $taskId }}">
                                     <div class="d-flex align-items-center">
                                         <div class="form-check me-3">
-                                            <input class="form-check-input task-checkbox" type="checkbox" id="task{{ $taskId }}" data-completed="false">
+                                            <input class="form-check-input task-checkbox" type="checkbox" id="task{{ $taskId }}" data-completed="{{ $isCompleted ? 'true' : 'false' }}" @checked($isCompleted)>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <label for="task{{ $taskId }}" class="task-title mb-1">{{ $title }}</label>
+                                            <label for="task{{ $taskId }}" class="task-title mb-1 {{ $isCompleted ? 'task-completed' : '' }}">{{ $title }}</label>
                                             @if($timeText)
                                                 <p class="text-muted small mb-0">
                                                     <i class="bi bi-clock me-1"></i>{{ $timeText }}
@@ -670,57 +671,45 @@
 </style>
 @endpush
 
-@push('scripts')
 <script>
     // ========================
-    // TASK COMPLETION LOGIC
+    // TASK STATUS SYNC (CHECKBOX DATABASE)
     // ========================
-    function initializeTaskCheckboxes() {
-        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const taskItem = this.closest('.task-item');
-                const taskTitle = taskItem.querySelector('.task-title');
-                const taskId = taskItem.getAttribute('data-task-id');
-                
-                if (this.checked) {
-                    // Animasi fade out untuk berpindah
-                    taskItem.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                    taskItem.style.opacity = '0.5';
-                    taskItem.style.transform = 'translateX(-10px)';
-                    
-                    setTimeout(() => {
-                        // Pindahkan task ke section Terselesaikan
-                        moveTaskToCompleted(taskItem, taskId);
-                        updateTaskCounters();
-                    }, 300);
-                } else {
-                    // Jika dicentang ulang, pindah kembali ke aktif
-                    taskTitle.classList.remove('task-completed');
-                    moveTaskToActive(taskItem, taskId);
-                    updateTaskCounters();
-                }
-            });
+    function syncTaskStatusToServer(taskId, isCompleted) {
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        fetch("{{ url('/rencana') }}/" + taskId + "/status", {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({ status: isCompleted ? 'selesai' : null }),
+        }).catch(() => {
+            // Untuk saat ini, abaikan error agar UX tetap halus
         });
     }
 
     function moveTaskToCompleted(taskItem, taskId) {
         const completedList = document.getElementById('completedTasksList');
         const taskTitle = taskItem.querySelector('.task-title');
-        
+
         // Tambah class completed
         taskTitle.classList.add('task-completed');
-        
+
         // Update checkbox attribute
         const checkbox = taskItem.querySelector('.task-checkbox');
         checkbox.setAttribute('data-completed', 'true');
-        
+
         // Pindahkan ke list completed
         completedList.appendChild(taskItem);
-        
+
         // Tampilkan section Terselesaikan jika sebelumnya hidden
         const completedSection = document.getElementById('completedTasksSection');
         completedSection.style.display = 'block';
-        
+
         // Animasi fade in
         setTimeout(() => {
             taskItem.style.opacity = '1';
@@ -730,14 +719,14 @@
 
     function moveTaskToActive(taskItem, taskId) {
         const activeList = document.getElementById('activeTasksList');
-        
+
         // Update checkbox attribute
         const checkbox = taskItem.querySelector('.task-checkbox');
         checkbox.setAttribute('data-completed', 'false');
-        
+
         // Pindahkan ke list aktif
         activeList.appendChild(taskItem);
-        
+
         // Sembunyikan section Terselesaikan jika tidak ada task
         updateCompletedSectionVisibility();
     }
@@ -745,11 +734,11 @@
     function updateTaskCounters() {
         const activeTasks = document.querySelectorAll('#activeTasksList .task-item').length;
         const completedTasks = document.querySelectorAll('#completedTasksList .task-item').length;
-        
+
         // Update counters
         document.getElementById('activeTasksCount').textContent = `${activeTasks} Tugas`;
         document.getElementById('completedTasksCount').textContent = `${completedTasks} Tugas`;
-        
+
         // Tampilkan empty state jika tidak ada task aktif
         const emptyState = document.getElementById('emptyState');
         if (activeTasks === 0 && completedTasks === 0) {
@@ -757,21 +746,21 @@
         } else {
             emptyState.classList.add('d-none');
         }
-        
+
         // Update sidebar badge secara realtime
         updateSidebarBadge();
 
         // Update widget Statistik Hari Ini di sidebar
         updateTodayStatsFromDOM();
     }
-    
+
     function updateSidebarBadge() {
         const sidebarBadge = document.getElementById('sidebarBadge');
         if (!sidebarBadge) return;
-        
+
         // Hitung task yang belum selesai (pending) = task di activeTasksList yang checkboxnya TIDAK di-check
         const pendingTasks = document.querySelectorAll('#activeTasksList .task-item .task-checkbox:not(:checked)').length;
-        
+
         // Simpan ke localStorage agar bisa dibaca di halaman lain
         if (typeof window.savePendingTasksCount === 'function') {
             window.savePendingTasksCount(pendingTasks);
@@ -779,7 +768,7 @@
             // Fallback jika fungsi global belum tersedia
             localStorage.setItem('focusday.pendingTasks', pendingTasks.toString());
         }
-        
+
         if (pendingTasks > 0) {
             // Tampilkan badge dengan jumlah pending tasks
             sidebarBadge.textContent = pendingTasks;
@@ -793,7 +782,7 @@
     function updateCompletedSectionVisibility() {
         const completedSection = document.getElementById('completedTasksSection');
         const completedTasks = document.querySelectorAll('#completedTasksList .task-item').length;
-        
+
         if (completedTasks > 0) {
             completedSection.style.display = 'block';
         } else {
@@ -834,33 +823,45 @@
     // ========================
     // FORM VALIDATION & UI
     // ========================
-    document.getElementById('taskForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        if (!this.checkValidity()) { event.stopPropagation(); this.classList.add('was-validated'); return; }
-        addTask();
-    });
-    
-    document.getElementById('taskNotes').addEventListener('input', function() {
-        document.getElementById('charCount').textContent = this.value.length;
-    });
-    
-    document.getElementById('noSpecificTime').addEventListener('change', function() {
-        const wrapper = document.getElementById('datetimeSection');
-        const timeInputs = document.querySelectorAll('#startTimeInput, #endTimeInput');
-        if (this.checked) {
-            wrapper.classList.add('disabled');
-            timeInputs.forEach(input => { input.value = ''; input.disabled = true; });
-        } else {
-            wrapper.classList.remove('disabled');
-            timeInputs.forEach(input => {
-                input.value = (input.id === 'startTimeInput' ? '7:30pm' : '8:30pm');
-                input.disabled = false;
-            });
-        }
-    });
+    const taskFormEl = document.getElementById('taskForm');
+    if (taskFormEl) {
+        taskFormEl.addEventListener('submit', function(event) {
+            event.preventDefault();
+            if (!this.checkValidity()) { event.stopPropagation(); this.classList.add('was-validated'); return; }
+            if (typeof addTask === 'function') {
+                addTask();
+            }
+        });
+    }
+
+    const taskNotesEl = document.getElementById('taskNotes');
+    if (taskNotesEl) {
+        taskNotesEl.addEventListener('input', function() {
+            const charCount = document.getElementById('charCount');
+            if (charCount) charCount.textContent = this.value.length;
+        });
+    }
+
+    const noSpecificTimeEl = document.getElementById('noSpecificTime');
+    if (noSpecificTimeEl) {
+        noSpecificTimeEl.addEventListener('change', function() {
+            const wrapper = document.getElementById('datetimeSection');
+            const timeInputs = document.querySelectorAll('#startTimeInput, #endTimeInput');
+            if (this.checked) {
+                if (wrapper) wrapper.classList.add('disabled');
+                timeInputs.forEach(input => { input.value = ''; input.disabled = true; });
+            } else {
+                if (wrapper) wrapper.classList.remove('disabled');
+                timeInputs.forEach(input => {
+                    input.value = (input.id === 'startTimeInput' ? '7:30pm' : '8:30pm');
+                    input.disabled = false;
+                });
+            }
+        });
+    }
 
     // ========================
-    // CATEGORY LOGIC
+    // CATEGORY LOGIC (LOCALSTORAGE)
     // ========================
     const STORAGE_KEY_CATEGORIES = 'focusday.categories';
 
@@ -909,14 +910,24 @@
 
     function showAddCategory() {
         const form = document.getElementById('addCategoryForm');
+        if (!form) return;
         form.classList.toggle('d-none');
-        if (!form.classList.contains('d-none')) document.getElementById('newCategoryName').focus();
+        if (!form.classList.contains('d-none')) {
+            const input = document.getElementById('newCategoryName');
+            if (input) input.focus();
+        }
     }
-    
+
     function addNewCategory() {
-        const categoryName = document.getElementById('newCategoryName').value.trim();
+        const input = document.getElementById('newCategoryName');
+        if (!input) return;
+        const categoryName = input.value.trim();
         if (!categoryName) return alert('Mohon isi nama kategori');
-        const colors = [{bg:'#fef3c7', text:'#92400e', icon:'bi-palette'}, {bg:'#e0e7ff', text:'#3730a3', icon:'bi-star'}, {bg:'#fce7f3', text:'#9d174d', icon:'bi-heart'}];
+        const colors = [
+            {bg:'#fef3c7', text:'#92400e', icon:'bi-palette'},
+            {bg:'#e0e7ff', text:'#3730a3', icon:'bi-star'},
+            {bg:'#fce7f3', text:'#9d174d', icon:'bi-heart'}
+        ];
         const color = colors[Math.floor(Math.random() * colors.length)];
         const key = slugify(categoryName) || ('kategori-' + Date.now());
 
@@ -928,40 +939,40 @@
         }
 
         loadCategoryOptionsFromStorage();
-        document.getElementById('newCategoryName').value = '';
-        document.getElementById('addCategoryForm').classList.add('d-none');
+        input.value = '';
+        const form = document.getElementById('addCategoryForm');
+        if (form) form.classList.add('d-none');
     }
 
     // ========================
-    // DATE WIDGET LOGIC (CENTERED)
+    // DATE & TIME PICKER LOGIC
     // ========================
     const dateDisplayBox = document.getElementById('dateDisplayBox');
     const dateText = document.getElementById('dateText');
     const calendarPopup = document.getElementById('calendarPopup');
     const calendarTitle = document.getElementById('calendarTitle');
     const calendarGrid = document.querySelector('.calendar-grid');
-    
-    let currentDate = new Date(); 
+
+    let currentDate = new Date();
     let selectedDate = new Date();
 
-    dateDisplayBox.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (document.getElementById('datetimeSection').classList.contains('disabled')) return;
-        const isOpen = calendarPopup.classList.contains('show');
-        closeAllPopups();
-        if (!isOpen) {
-            calendarPopup.classList.add('show');
-            dateDisplayBox.classList.add('active');
-            renderCalendar();
-        }
-    });
+    function updateDateDisplay() {
+        if (!dateText) return;
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        dateText.textContent = selectedDate.toLocaleDateString('en-US', options);
+    }
 
     function renderCalendar() {
+        if (!calendarGrid || !calendarTitle) return;
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        calendarTitle.textContent = `${monthNames[month]} ${year}`;
+        const monthNames = [
+            'January','February','March','April','May','June',
+            'July','August','September','October','November','December'
+        ];
+        calendarTitle.textContent = monthNames[month] + ' ' + year;
         calendarGrid.innerHTML = '<div class="calendar-day-label">Su</div><div class="calendar-day-label">Mo</div><div class="calendar-day-label">Tu</div><div class="calendar-day-label">We</div><div class="calendar-day-label">Th</div><div class="calendar-day-label">Fr</div><div class="calendar-day-label">Sa</div>';
+
         const firstDayIndex = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = new Date();
@@ -976,62 +987,108 @@
             const dayEl = document.createElement('div');
             dayEl.classList.add('calendar-day');
             dayEl.textContent = i;
-            if (i === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) dayEl.classList.add('selected');
-            if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) dayEl.classList.add('today');
+            if (
+                i === selectedDate.getDate() &&
+                month === selectedDate.getMonth() &&
+                year === selectedDate.getFullYear()
+            ) {
+                dayEl.classList.add('selected');
+            }
+            if (
+                i === today.getDate() &&
+                month === today.getMonth() &&
+                year === today.getFullYear()
+            ) {
+                dayEl.classList.add('today');
+            }
             dayEl.addEventListener('click', (e) => {
                 e.stopPropagation();
                 selectedDate = new Date(year, month, i);
                 updateDateDisplay();
-                calendarPopup.classList.remove('show');
-                dateDisplayBox.classList.remove('active');
+                closeAllPopups();
             });
             calendarGrid.appendChild(dayEl);
         }
     }
 
-    function updateDateDisplay() {
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const parts = selectedDate.toLocaleDateString('en-US', options).split(',');
-        dateText.textContent = `${parts[0]}, ${parts[1]}`;
-    }
-
-    document.getElementById('prevMonth').addEventListener('click', (e) => { e.stopPropagation(); currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
-    document.getElementById('nextMonth').addEventListener('click', (e) => { e.stopPropagation(); currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
-
-    // ========================
-    // TIME WIDGET LOGIC
-    // ========================
-    function generateTimeOptions() {
-        const times = [];
-        for (let i = 0; i < 24; i++) {
-            for (let j = 0; j < 60; j += 15) {
-                const hour = i; const minute = j;
-                const period = hour >= 12 ? 'pm' : 'am';
-                const displayHour = hour % 12 || 12;
-                const displayMinute = minute < 10 ? '0' + minute : minute;
-                times.push(`${displayHour}:${displayMinute}${period}`);
+    if (dateDisplayBox) {
+        dateDisplayBox.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const datetimeSection = document.getElementById('datetimeSection');
+            if (datetimeSection && datetimeSection.classList.contains('disabled')) return;
+            const isOpen = calendarPopup && calendarPopup.classList.contains('show');
+            closeAllPopups();
+            if (!isOpen && calendarPopup) {
+                calendarPopup.classList.add('show');
+                dateDisplayBox.classList.add('active');
+                renderCalendar();
             }
-        }
-        return times;
+        });
     }
-    const timeOptions = generateTimeOptions();
 
     function setupTimePicker(inputId, dropdownId) {
         const input = document.getElementById(inputId);
         const dropdown = document.getElementById(dropdownId);
-        populateDropdown(dropdown, timeOptions, input);
+        if (!input || !dropdown) return;
+
+        const times = [];
+        const ampm = ['am', 'pm'];
+        for (let h = 0; h < 24; h++) {
+            const hour12 = h % 12 === 0 ? 12 : h % 12;
+            const suffix = ampm[Math.floor(h / 12)];
+            times.push(hour12 + ':00' + suffix);
+            times.push(hour12 + ':30' + suffix);
+        }
+
+        function populateDropdown(options) {
+            dropdown.innerHTML = '';
+            options.forEach(time => {
+                const div = document.createElement('div');
+                div.className = 'time-option';
+                div.textContent = time;
+                if (time === input.value) div.classList.add('highlighted');
+                div.addEventListener('mouseover', function() {
+                    dropdown.querySelectorAll('.time-option').forEach(el => el.classList.remove('highlighted'));
+                    this.classList.add('highlighted');
+                });
+                div.addEventListener('click', () => {
+                    input.value = time;
+                    dropdown.classList.remove('show');
+                });
+                dropdown.appendChild(div);
+            });
+        }
+
+        function filterDropdown(query) {
+            const options = dropdown.querySelectorAll('.time-option');
+            const lowerQuery = query.toLowerCase();
+            let firstVisible = null;
+            options.forEach(opt => {
+                const text = opt.textContent.toLowerCase();
+                if (text.includes(lowerQuery)) {
+                    opt.style.display = 'block';
+                    if (!firstVisible) firstVisible = opt;
+                } else {
+                    opt.style.display = 'none';
+                }
+                opt.classList.remove('highlighted');
+            });
+            if (firstVisible) {
+                firstVisible.classList.add('highlighted');
+                firstVisible.scrollIntoView({ block: 'nearest' });
+            }
+        }
 
         input.addEventListener('focus', (e) => {
             e.stopPropagation();
-            if (document.getElementById('datetimeSection').classList.contains('disabled')) return;
-            document.querySelectorAll('.time-dropdown').forEach(d => { if(d !== dropdown) d.classList.remove('show'); });
+            populateDropdown(times);
             dropdown.classList.add('show');
-            input.parentElement.classList.add('active');
-            filterDropdown(input.value, dropdown);
         });
 
-        input.addEventListener('input', (e) => { filterDropdown(e.target.value, dropdown); });
-        
+        input.addEventListener('input', (e) => {
+            filterDropdown(e.target.value);
+        });
+
         input.addEventListener('keydown', (e) => {
             const highlighted = dropdown.querySelector('.time-option.highlighted');
             if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -1041,14 +1098,18 @@
                 if (e.key === 'ArrowDown') currentIndex = (currentIndex + 1) % options.length;
                 if (e.key === 'ArrowUp') currentIndex = (currentIndex - 1 + options.length) % options.length;
                 options.forEach(opt => opt.classList.remove('highlighted'));
-                if(options[currentIndex]) {
+                if (options[currentIndex]) {
                     options[currentIndex].classList.add('highlighted');
                     options[currentIndex].scrollIntoView({ block: 'nearest' });
                 }
             } else if (e.key === 'Enter') {
                 e.preventDefault();
-                if (highlighted) { input.value = highlighted.textContent; dropdown.classList.remove('show'); } 
-                else { dropdown.classList.remove('show'); }
+                if (highlighted) {
+                    input.value = highlighted.textContent;
+                    dropdown.classList.remove('show');
+                } else {
+                    dropdown.classList.remove('show');
+                }
             }
         });
 
@@ -1060,125 +1121,159 @@
         });
     }
 
-    function populateDropdown(dropdown, options, input) {
-        dropdown.innerHTML = '';
-        options.forEach(time => {
-            const div = document.createElement('div');
-            div.className = 'time-option';
-            div.textContent = time;
-            if (time === input.value) div.classList.add('highlighted');
-            div.addEventListener('mouseover', function() {
-                dropdown.querySelectorAll('.time-option').forEach(el => el.classList.remove('highlighted'));
-                this.classList.add('highlighted');
-            });
-            dropdown.appendChild(div);
-        });
+    function closeAllPopups() {
+        if (calendarPopup) calendarPopup.classList.remove('show');
+        if (dateDisplayBox) dateDisplayBox.classList.remove('active');
+        const startDropdown = document.getElementById('startTimeDropdown');
+        const endDropdown = document.getElementById('endTimeDropdown');
+        if (startDropdown) startDropdown.classList.remove('show');
+        if (endDropdown) endDropdown.classList.remove('show');
+        const startGroup = document.getElementById('startTimeGroup');
+        const endGroup = document.getElementById('endTimeGroup');
+        if (startGroup) startGroup.classList.remove('active');
+        if (endGroup) endGroup.classList.remove('active');
     }
 
-    function filterDropdown(query, dropdown) {
-        const options = dropdown.querySelectorAll('.time-option');
-        const lowerQuery = query.toLowerCase();
-        let firstVisible = null;
-        options.forEach(opt => {
-            const text = opt.textContent.toLowerCase();
-            if (text.includes(lowerQuery)) {
-                opt.style.display = 'block';
-                if (!firstVisible) firstVisible = opt;
-            } else { opt.style.display = 'none'; }
-            opt.classList.remove('highlighted');
-        });
-        if (firstVisible) { firstVisible.classList.add('highlighted'); firstVisible.scrollIntoView({ block: 'nearest' }); }
+    window.addEventListener('click', closeAllPopups);
+
+    const calendarEl = calendarPopup;
+    if (calendarEl) {
+        calendarEl.addEventListener('click', (e) => e.stopPropagation());
     }
+
+    const startDropdownEl = document.getElementById('startTimeDropdown');
+    const endDropdownEl = document.getElementById('endTimeDropdown');
+    if (startDropdownEl) startDropdownEl.addEventListener('click', (e) => e.stopPropagation());
+    if (endDropdownEl) endDropdownEl.addEventListener('click', (e) => e.stopPropagation());
 
     setupTimePicker('startTimeInput', 'startTimeDropdown');
     setupTimePicker('endTimeInput', 'endTimeDropdown');
 
     // ========================
-    // GLOBAL POPUP HANDLING
-    // ========================
-    window.addEventListener('click', closeAllPopups);
-    calendarPopup.addEventListener('click', (e) => e.stopPropagation());
-    document.getElementById('startTimeDropdown').addEventListener('click', (e) => e.stopPropagation());
-    document.getElementById('endTimeDropdown').addEventListener('click', (e) => e.stopPropagation());
-
-    function closeAllPopups() {
-        calendarPopup.classList.remove('show');
-        dateDisplayBox.classList.remove('active');
-        document.getElementById('startTimeDropdown').classList.remove('show');
-        document.getElementById('endTimeDropdown').classList.remove('show');
-        document.getElementById('startTimeGroup').classList.remove('active');
-        document.getElementById('endTimeGroup').classList.remove('active');
-    }
-
-    // ========================
-    // ADD TASK FUNCTION
+    // ADD TASK (SAVE TO DB)
     // ========================
     function addTask() {
         const form = document.getElementById('taskForm');
-        if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
-        const isNoTime = document.getElementById('noSpecificTime').checked;
+        if (!form) return;
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const noTime = document.getElementById('noSpecificTime');
+        const isNoTime = noTime ? noTime.checked : false;
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const day = String(selectedDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-        const startTime = document.getElementById('startTimeInput').value;
-        const endTime = document.getElementById('endTimeInput').value;
+        const startTime = document.getElementById('startTimeInput')?.value || '';
+        const endTime = document.getElementById('endTimeInput')?.value || '';
         const formattedTime = isNoTime ? null : `${startTime} – ${endTime}`;
 
-        const taskData = {
-            title: document.getElementById('taskTitle').value,
-            category: document.querySelector('input[name="taskCategory"]:checked')?.value,
-            date: formattedDate, time: formattedTime,
-            notes: document.getElementById('taskNotes').value,
-            hasNoSpecificTime: isNoTime
-        };
-        
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addTaskModal'));
-        modal.hide();
-        form.reset();
-        form.classList.remove('was-validated');
-        document.getElementById('charCount').textContent = '0';
-        selectedDate = new Date(); currentDate = new Date();
-        updateDateDisplay();
-        document.getElementById('startTimeInput').value = "7:30pm";
-        document.getElementById('endTimeInput').value = "8:30pm";
-        document.getElementById('datetimeSection').classList.remove('disabled');
-        document.getElementById('startTimeInput').disabled = false;
-        document.getElementById('endTimeInput').disabled = false;
-        
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        toast.show();
-        
-        // Update sidebar badge setelah menambah task baru
-        updateSidebarBadge();
+        const kategoriInput = document.querySelector('input[name="taskCategory"]:checked');
+        const kategoriId = kategoriInput ? kategoriInput.value : null;
 
-        // Pastikan widget Statistik Hari Ini ikut ter-update
-        updateTodayStatsFromDOM();
+        const payload = {
+            judul_tugas: document.getElementById('taskTitle')?.value || '',
+            kategori_id: kategoriId,
+            tanggal: formattedDate,
+            waktu: formattedTime,
+            catatan: document.getElementById('taskNotes')?.value || ''
+        };
+
+        const modalEl = document.getElementById('addTaskModal');
+        const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl) : null;
+
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        fetch("{{ route('rencana.store') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify(payload),
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Gagal menyimpan');
+            }
+            return response.json();
+        }).then(() => {
+            if (modal) modal.hide();
+            form.reset();
+            form.classList.remove('was-validated');
+            const charCount = document.getElementById('charCount');
+            if (charCount) charCount.textContent = '0';
+            selectedDate = new Date();
+            currentDate = new Date();
+            updateDateDisplay();
+            const startInput = document.getElementById('startTimeInput');
+            const endInput = document.getElementById('endTimeInput');
+            const datetimeSection = document.getElementById('datetimeSection');
+            if (startInput) { startInput.value = '7:30pm'; startInput.disabled = false; }
+            if (endInput) { endInput.value = '8:30pm'; endInput.disabled = false; }
+            if (datetimeSection) datetimeSection.classList.remove('disabled');
+
+            const toastEl = document.getElementById('successToast');
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+
+            setTimeout(() => { window.location.reload(); }, 600);
+        }).catch(() => {
+            alert('Gagal menyimpan rencana. Silakan coba lagi.');
+        });
     }
 
     // ========================
     // INITIALIZATION
     // ========================
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize semua komponen
-        initializeTaskCheckboxes();
-        updateDateDisplay();
-        loadCategoryOptionsFromStorage();
+        // Attach event listener ke semua checkbox tugas
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const taskItem = this.closest('.task-item');
+                if (!taskItem) return;
+                const taskId = taskItem.getAttribute('data-task-id');
+                const isCompleted = this.checked;
 
-        // Set initial state untuk task yang sudah checked (pindahkan dulu ke section Terselesaikan)
+                if (isCompleted) {
+                    // Animasi kecil lalu pindah ke section Terselesaikan
+                    taskItem.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    taskItem.style.opacity = '0.5';
+                    taskItem.style.transform = 'translateX(-10px)';
+
+                    setTimeout(() => {
+                        moveTaskToCompleted(taskItem, taskId);
+                        updateTaskCounters();
+                    }, 300);
+                } else {
+                    const titleEl = taskItem.querySelector('.task-title');
+                    if (titleEl) titleEl.classList.remove('task-completed');
+                    moveTaskToActive(taskItem, taskId);
+                    updateTaskCounters();
+                }
+
+                // Sinkronkan status ke server
+                syncTaskStatusToServer(taskId, isCompleted);
+            });
+        });
+
+        // Set initial state untuk task yang sudah checked (status = selesai)
         document.querySelectorAll('.task-checkbox:checked').forEach(checkbox => {
             const taskItem = checkbox.closest('.task-item');
+            if (!taskItem) return;
             const taskId = taskItem.getAttribute('data-task-id');
             moveTaskToCompleted(taskItem, taskId);
         });
 
-        // Setelah posisi task benar, baru hitung ulang counter dan statistik
         updateCompletedSectionVisibility();
         updateTaskCounters();
-        
-        // Modal focus
-        const modal = document.getElementById('addTaskModal');
-        modal.addEventListener('shown.bs.modal', function() { document.getElementById('taskTitle').focus(); });
+
+        updateDateDisplay();
+        loadCategoryOptionsFromStorage();
     });
 </script>
-@endpush
