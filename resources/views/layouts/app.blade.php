@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'FocusDay - Aplikasi Manajemen Tugas')</title>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
     
     <!-- Google Fonts - Inter (Dari layout lama untuk tipografi terbaik) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -709,7 +711,7 @@
                     <div class="dropdown">
                         @php
                             $sessionUser = session('user');
-                            $displayName = $sessionUser['username'] ?? $sessionUser['email'] ?? 'Pengguna';
+                            $displayName = $sessionUser['name'] ?? $sessionUser['email'] ?? 'Pengguna';
                             $displayEmail = $sessionUser['email'] ?? 'user@example.com';
                             $initials = strtoupper(substr($displayName, 0, 2));
                         @endphp

@@ -157,9 +157,115 @@ Route::get('/categories', function () {
 })->name('categories');
 
 // Settings Page - Pengaturan
-Route::get('/settings', function () {
-    return view('settings');
+Route::get('/settings', function (Request $request) {
+    if (!$request->session()->has('user')) {
+        return redirect()->route('login');
+    }
+
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    $user = null;
+    if ($userId) {
+        $user = User::query()->find($userId);
+    }
+
+    return view('settings', [
+        'user' => $user,
+    ]);
 })->name('settings');
+
+Route::post('/settings/profile', function (Request $request) {
+    if (!$request->session()->has('user')) {
+        return redirect()->route('login');
+    }
+
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+    if (!$userId) {
+        return redirect()->route('login');
+    }
+
+    $data = $request->validate([
+        'name'  => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $userId],
+    ]);
+
+    $user = User::query()->findOrFail($userId);
+    $user->fill($data);
+    $user->save();
+
+    $request->session()->put('user', [
+        'id'         => $user->id,
+        'name'       => $user->name,
+        'email'      => $user->email,
+        'theme'      => $user->theme ?? 'light',
+        'week_start' => $user->week_start ?? 1,
+    ]);
+
+    return back()->with('success', 'Profil berhasil diperbarui.');
+})->name('settings.profile.update');
+
+Route::post('/settings/password', function (Request $request) {
+    if (!$request->session()->has('user')) {
+        return redirect()->route('login');
+    }
+
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+    if (!$userId) {
+        return redirect()->route('login');
+    }
+
+    $data = $request->validate([
+        'current_password' => ['required', 'string'],
+        'password'         => ['required', 'string', 'min:8', 'confirmed'],
+    ], [
+        'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+    ]);
+
+    $user = User::query()->findOrFail($userId);
+    if (!Hash::check($data['current_password'], $user->password)) {
+        return back()->withErrors(['current_password' => 'Password lama tidak sesuai.']);
+    }
+
+    $user->password = Hash::make($data['password']);
+    $user->save();
+
+    return back()->with('success', 'Password berhasil diperbarui.');
+})->name('settings.password.update');
+
+Route::post('/settings/preferences', function (Request $request) {
+    if (!$request->session()->has('user')) {
+        return redirect()->route('login');
+    }
+
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+    if (!$userId) {
+        return redirect()->route('login');
+    }
+
+    $data = $request->validate([
+        'theme'      => ['required', 'in:light,dark'],
+        'week_start' => ['required', 'in:0,1'],
+    ]);
+
+    $user = User::query()->findOrFail($userId);
+    $user->theme = $data['theme'];
+    $user->week_start = (int) $data['week_start'];
+    $user->save();
+
+    $request->session()->put('user', [
+        'id'         => $user->id,
+        'name'       => $user->name,
+        'email'      => $user->email,
+        'theme'      => $user->theme ?? 'light',
+        'week_start' => $user->week_start ?? 1,
+    ]);
+
+    return back()->with('success', 'Preferensi berhasil disimpan.');
+})->name('settings.preferences.update');
 
 // Login Page - Halaman Login
 Route::get('/login', function () {
@@ -190,11 +296,21 @@ Route::post('/login', function (Request $request) {
         'id'    => $user->id,
         'name'  => $user->name,
         'email' => $user->email,
+        'theme' => $user->theme ?? 'light',
+        'week_start' => $user->week_start ?? 1,
     ]);
 
     // Arahkan ke halaman utama
     return redirect()->route('home');
 })->name('login.submit');
+
+Route::post('/logout', function (Request $request) {
+    $request->session()->forget('user');
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('login');
+})->name('logout');
 
 // Register Page - Halaman Registrasi
 Route::get('/register', function () {
