@@ -561,6 +561,12 @@
                     @endif
                 </div>
 
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 <!-- Login Form -->
                 <form id="loginForm" action="{{ route('login.submit') }}" method="POST">
                     @csrf

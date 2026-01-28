@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Agenda;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 // Route lama (welcome page original)
 Route::get('/welcome', function () {
@@ -65,12 +66,13 @@ Route::post('/login', function (Request $request) {
         'password' => ['required', 'string'],
     ]);
 
-    // Ambil user berdasarkan username
-    $user = DB::table('user')->where('username', $credentials['username'])->first();
+    $login = $credentials['username'];
+    $user = User::query()
+        ->where('email', $login)
+        ->orWhere('name', $login)
+        ->first();
 
-    // Dalam setup saat ini password disimpan plain text (misalnya "tes")
-    // Jadi kita bandingkan langsung. Jika nanti memakai hash, logika ini perlu diubah.
-    if (!$user || $user->password !== $credentials['password']) {
+    if (!$user || !Hash::check($credentials['password'], $user->password)) {
         return back()
             ->withErrors(['login' => 'Username atau password tidak sesuai.'])
             ->withInput($request->only('username'));
@@ -78,9 +80,9 @@ Route::post('/login', function (Request $request) {
 
     // Simpan user ke session
     $request->session()->put('user', [
-        'id'       => $user->id ?? null,
-        'username' => $user->username ?? null,
-        'email'    => $user->email ?? null,
+        'id'    => $user->id,
+        'name'  => $user->name,
+        'email' => $user->email,
     ]);
 
     // Arahkan ke halaman utama
@@ -91,3 +93,17 @@ Route::post('/login', function (Request $request) {
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
+
+Route::post('/register', function (Request $request) {
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+        'password' => ['required', 'string', 'min:8', 'confirmed'],
+    ], [
+        'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+    ]);
+
+    User::create($validated);
+
+    return redirect()->route('login')->with('success', 'Akun berhasil dibuat. Silakan masuk.');
+})->name('register.store');
