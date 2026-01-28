@@ -706,16 +706,22 @@
                     </button>
 
                     <div class="dropdown">
+                        @php
+                            $sessionUser = session('user');
+                            $displayName = $sessionUser['username'] ?? $sessionUser['email'] ?? 'Pengguna';
+                            $displayEmail = $sessionUser['email'] ?? 'user@example.com';
+                            $initials = strtoupper(substr($displayName, 0, 2));
+                        @endphp
                         <button class="profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <span class="profile-avatar">
-                                {{ strtoupper(substr(auth()->check() ? auth()->user()->name : 'JD', 0, 2)) }}
+                                {{ $initials }}
                             </span>
                             <span class="profile-meta text-start">
                                 <span class="d-block" style="font-weight: 600; font-size: 0.875rem; line-height: 1.1;">
-                                    {{ auth()->check() ? auth()->user()->name : 'John Doe' }}
+                                    {{ $displayName }}
                                 </span>
                                 <span class="d-block text-muted" style="font-size: 0.75rem; line-height: 1.1;">
-                                    {{ auth()->check() ? auth()->user()->email : 'user@example.com' }}
+                                    {{ $displayEmail }}
                                 </span>
                             </span>
                         </button>
