@@ -194,7 +194,7 @@
             background: #ffffff;
             display: flex;
             flex-direction: column;
-            padding: 2rem;
+            padding: 1.5rem;
             position: relative;
             transition: background-color 0.3s ease;
         }
@@ -253,7 +253,7 @@
 
         /* Form Heading */
         .form-heading {
-            margin-bottom: 2rem;
+            margin-bottom: 1.25rem;
             text-align: center;
         }
 
@@ -279,7 +279,7 @@
 
         /* Form Fields */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .form-label {
@@ -300,7 +300,7 @@
 
         .form-control {
             width: 100%;
-            padding: 0.875rem 1rem;
+            padding: 0.75rem 0.95rem;
             border: 2px solid #e5e7eb;
             border-radius: 12px;
             font-size: 1rem;
@@ -347,7 +347,7 @@
         /* Submit Button */
         .btn-login {
             width: 100%;
-            padding: 1rem;
+            padding: 0.85rem;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none;
             border-radius: 12px;
@@ -372,7 +372,7 @@
         .divider {
             display: flex;
             align-items: center;
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             color: #9ca3af;
             font-size: 0.875rem;
         }
@@ -437,12 +437,41 @@
             }
 
             .right-section {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem 1.25rem;
             }
 
             .theme-toggle {
                 top: 1rem;
                 right: 1rem;
+            }
+        }
+
+        @media (max-height: 800px) {
+            .right-section {
+                padding: 1.25rem;
+            }
+
+            .form-heading h1 {
+                font-size: 1.75rem;
+            }
+
+            .form-heading {
+                margin-bottom: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 0.85rem;
+            }
+
+            .divider {
+                margin: 0.85rem 0;
+            }
+
+            .theme-toggle {
+                top: 1.5rem;
+                right: 1.5rem;
+                width: 44px;
+                height: 44px;
             }
         }
 
