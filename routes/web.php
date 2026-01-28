@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Models\Agenda;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 // Route lama (welcome page original)
 Route::get('/welcome', function () {
@@ -31,7 +33,59 @@ Route::get('/', function (Request $request) {
         return redirect()->route('login');
     }
 
-    return view('home');
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    $todayTasks = collect();
+    $upcomingTasks = collect();
+    $categories = collect();
+
+    if ($userId) {
+        $todayDate = Carbon::today()->toDateString();
+
+        // Ambil rencana untuk hari ini (join ke kategori untuk dapat nama_kategori)
+        $todayTasks = DB::table('rencana')
+            ->leftJoin('kategori', 'rencana.kategori_id', '=', 'kategori.kategori_id')
+            ->where('rencana.user_id', $userId)
+            ->whereDate('rencana.tanggal', $todayDate)
+            ->orderBy('rencana.tanggal')
+            ->select(
+                'rencana.rencana_id as id',
+                'rencana.judul_tugas',
+                'rencana.waktu',
+                'rencana.tanggal',
+                'kategori.nama_kategori'
+            )
+            ->get();
+
+        // Ambil rencana mendatang (setelah hari ini)
+        $upcomingTasks = DB::table('rencana')
+            ->leftJoin('kategori', 'rencana.kategori_id', '=', 'kategori.kategori_id')
+            ->where('rencana.user_id', $userId)
+            ->whereDate('rencana.tanggal', '>', $todayDate)
+            ->orderBy('rencana.tanggal')
+            ->limit(20)
+            ->select(
+                'rencana.rencana_id as id',
+                'rencana.judul_tugas',
+                'rencana.waktu',
+                'rencana.tanggal',
+                'kategori.nama_kategori'
+            )
+            ->get();
+
+        // Ambil daftar kategori milik user ini
+        $categories = DB::table('kategori')
+            ->where('user_id', $userId)
+            ->orderBy('nama_kategori')
+            ->get();
+    }
+
+    return view('home', [
+        'todayTasks' => $todayTasks,
+        'upcomingTasks' => $upcomingTasks,
+        'categories' => $categories,
+    ]);
 })->name('home');
 
 // Calendar Page - Halaman Kalender (Monthly view)

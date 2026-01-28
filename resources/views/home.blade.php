@@ -32,89 +32,36 @@
                     <div class="mb-5" id="activeTasksSection">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h5 class="fw-semibold mb-0">Tugas Hari Ini</h5>
-                            <span class="badge bg-light text-secondary border" id="activeTasksCount">5 Tugas</span>
+                            <span class="badge bg-light text-secondary border" id="activeTasksCount">{{ $todayTasks->count() }} Tugas</span>
                         </div>
                         
                         <div class="list-group list-group-flush" id="activeTasksList">
-                            <!-- Task Item 1 -->
-                            <div class="list-group-item border-0 px-0 py-3 rounded task-item" data-task-id="1">
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check me-3">
-                                        <input class="form-check-input task-checkbox" type="checkbox" id="task1" data-completed="false">
+                            @forelse($todayTasks as $task)
+                                @php
+                                    $taskId = $task->id ?? uniqid('task_');
+                                    $title = $task->judul_tugas;
+                                    $timeText = $task->waktu;
+                                    $categoryLabel = $task->nama_kategori;
+                                @endphp
+                                <div class="list-group-item border-0 px-0 py-3 rounded task-item" data-task-id="{{ $taskId }}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input task-checkbox" type="checkbox" id="task{{ $taskId }}" data-completed="false">
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <label for="task{{ $taskId }}" class="task-title mb-1">{{ $title }}</label>
+                                            @if($timeText)
+                                                <p class="text-muted small mb-0">
+                                                    <i class="bi bi-clock me-1"></i>{{ $timeText }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                        <span class="badge rounded-pill category-badge category-work">{{ $categoryLabel }}</span>
                                     </div>
-                                    <div class="flex-grow-1">
-                                        <label for="task1" class="task-title mb-1">Meeting dengan Tim Developer</label>
-                                        <p class="text-muted small mb-0">
-                                            <i class="bi bi-clock me-1"></i>09:00 - 10:30
-                                        </p>
-                                    </div>
-                                    <span class="badge rounded-pill category-badge category-work">Kerja</span>
                                 </div>
-                            </div>
-                            
-                            <!-- Task Item 2 -->
-                            <div class="list-group-item border-0 px-0 py-3 rounded task-item" data-task-id="2">
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check me-3">
-                                        <input class="form-check-input task-checkbox" type="checkbox" id="task2" checked data-completed="true">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label for="task2" class="task-title task-completed mb-1">Review Pull Request #234</label>
-                                        <p class="text-muted small mb-0">
-                                            <i class="bi bi-clock me-1"></i>11:00 - 12:00
-                                        </p>
-                                    </div>
-                                    <span class="badge rounded-pill category-badge category-work">Kerja</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Task Item 3 -->
-                            <div class="list-group-item border-0 px-0 py-3 rounded task-item" data-task-id="3">
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check me-3">
-                                        <input class="form-check-input task-checkbox" type="checkbox" id="task3" data-completed="false">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label for="task3" class="task-title mb-1">Belajar Laravel Livewire</label>
-                                        <p class="text-muted small mb-0">
-                                            <i class="bi bi-clock me-1"></i>14:00 - 16:00
-                                        </p>
-                                    </div>
-                                    <span class="badge rounded-pill category-badge category-learning">Belajar</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Task Item 4 -->
-                            <div class="list-group-item border-0 px-0 py-3 rounded task-item" data-task-id="4">
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check me-3">
-                                        <input class="form-check-input task-checkbox" type="checkbox" id="task4" data-completed="false">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label for="task4" class="task-title mb-1">Olahraga Sore</label>
-                                        <p class="text-muted small mb-0">
-                                            <i class="bi bi-clock me-1"></i>17:00 - 18:00
-                                        </p>
-                                    </div>
-                                    <span class="badge rounded-pill category-badge category-personal">Pribadi</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Task Item 5 -->
-                            <div class="list-group-item border-0 px-0 py-3 rounded task-item" data-task-id="5">
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check me-3">
-                                        <input class="form-check-input task-checkbox" type="checkbox" id="task5" data-completed="false">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <label for="task5" class="task-title mb-1">Persiapan Presentasi Client</label>
-                                        <p class="text-muted small mb-0">
-                                            <i class="bi bi-clock me-1"></i>19:00 - 20:00
-                                        </p>
-                                    </div>
-                                    <span class="badge rounded-pill category-badge category-work">Kerja</span>
-                                </div>
-                            </div>
+                            @empty
+                                {{-- Tidak ada tugas hari ini, biarkan JS menampilkan empty state berdasarkan counter --}}
+                            @endforelse
                         </div>
                     </div>
                     
@@ -152,35 +99,41 @@
                         Rencana Mendatang
                     </h5>
                     
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="p-3 bg-white rounded shadow-sm h-100">
-                                <p class="fw-semibold text-dark mb-3 border-bottom pb-2">Besok</p>
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="badge rounded-pill category-badge category-work me-2">Kerja</span>
-                                    <small class="text-truncate">Sprint Planning Meeting</small>
+                    @if($upcomingTasks->isEmpty())
+                        <p class="text-muted mb-0">Belum ada rencana mendatang.</p>
+                    @else
+                        <div class="row g-3">
+                            @foreach($upcomingTasks as $plan)
+                                @php
+                                    $planTitle = $plan->judul_tugas;
+                                    $planDate = $plan->tanggal;
+                                    $planTime = $plan->waktu;
+                                    $planCategory = $plan->nama_kategori;
+                                @endphp
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-white rounded shadow-sm h-100">
+                                        <p class="fw-semibold text-dark mb-3 border-bottom pb-2">
+                                            @if($planDate)
+                                                {{ \Carbon\Carbon::parse($planDate)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
+                                            @else
+                                                Jadwal Mendatang
+                                            @endif
+                                        </p>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="badge rounded-pill category-badge category-work me-2">{{ $planCategory }}</span>
+                                            <small class="text-truncate">{{ $planTitle }}</small>
+                                        </div>
+                                        @if($planTime)
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-clock me-2 text-muted"></i>
+                                                <small class="text-muted">{{ $planTime }}</small>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="badge rounded-pill category-badge category-learning me-2">Belajar</span>
-                                    <small class="text-truncate">Kursus Online PHP Advanced</small>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
-                        
-                        <div class="col-md-6">
-                            <div class="p-3 bg-white rounded shadow-sm h-100">
-                                <p class="fw-semibold text-dark mb-3 border-bottom pb-2">Minggu Ini</p>
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="badge rounded-pill category-badge category-personal me-2">Pribadi</span>
-                                    <small class="text-truncate">Kunjungan Keluarga</small>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="badge rounded-pill category-badge category-work me-2">Kerja</span>
-                                    <small class="text-truncate">Deadline Project X</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -222,7 +175,7 @@
                         <div class="invalid-feedback">Harap isi judul tugas</div>
                     </div>
                     
-                    <!-- Kategori (WARNA ASLI DIPERTAHANKAN) -->
+                    <!-- Kategori (dibaca dari tabel kategori milik user) -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center">
                             <span>
@@ -235,20 +188,19 @@
                             </button>
                         </label>
                         <div class="d-flex flex-wrap gap-2" id="categorySelection">
-                            <input type="radio" class="btn-check" name="taskCategory" id="categoryWork" value="work" autocomplete="off" checked>
-                            <label class="btn btn-sm btn-category btn-work" for="categoryWork">
-                                <i class="bi bi-briefcase me-1"></i>Kerja
-                            </label>
-                            
-                            <input type="radio" class="btn-check" name="taskCategory" id="categoryLearning" value="learning" autocomplete="off">
-                            <label class="btn btn-sm btn-category btn-learning" for="categoryLearning">
-                                <i class="bi bi-book me-1"></i>Belajar
-                            </label>
-                            
-                            <input type="radio" class="btn-check" name="taskCategory" id="categoryPersonal" value="personal" autocomplete="off">
-                            <label class="btn btn-sm btn-category btn-personal" for="categoryPersonal">
-                                <i class="bi bi-person me-1"></i>Pribadi
-                            </label>
+                            @forelse($categories as $index => $category)
+                                @php
+                                    $inputId = 'categoryDb_' . $category->kategori_id;
+                                    $isFirst = $index === 0;
+                                    // Sementara gunakan style "Kerja" untuk semua kategori agar konsisten dengan desain
+                                @endphp
+                                <input type="radio" class="btn-check" name="taskCategory" id="{{ $inputId }}" value="{{ $category->kategori_id }}" autocomplete="off" @checked($isFirst)>
+                                <label class="btn btn-sm btn-category btn-work" for="{{ $inputId }}">
+                                    <i class="bi bi-tag me-1"></i>{{ $category->nama_kategori }}
+                                </label>
+                            @empty
+                                <span class="text-muted small">Belum ada kategori. Tambah kategori dulu.</span>
+                            @endforelse
                             
                             <div id="additionalCategories"></div>
                         </div>
