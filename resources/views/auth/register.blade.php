@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - FocusDay</title>
+    <title>Register - FocusDay</title>
     
     <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -194,7 +194,7 @@
             background: #ffffff;
             display: flex;
             flex-direction: column;
-            padding: 2rem;
+            padding: 1.5rem;
             position: relative;
             transition: background-color 0.3s ease;
         }
@@ -253,7 +253,7 @@
 
         /* Form Heading */
         .form-heading {
-            margin-bottom: 2rem;
+            margin-bottom: 1.25rem;
             text-align: center;
         }
 
@@ -279,7 +279,7 @@
 
         /* Form Fields */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .form-label {
@@ -300,7 +300,7 @@
 
         .form-control {
             width: 100%;
-            padding: 0.875rem 1rem;
+            padding: 0.75rem 0.95rem;
             border: 2px solid #e5e7eb;
             border-radius: 12px;
             font-size: 1rem;
@@ -344,63 +344,10 @@
             color: #10b981;
         }
 
-        /* Options */
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-check-input {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #d1d5db;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        [data-theme="dark"] .form-check-input {
-            border-color: #4b5563;
-            background: #374151;
-        }
-
-        .form-check-input:checked {
-            background-color: #10b981;
-            border-color: #10b981;
-        }
-
-        .form-check-label {
-            color: #6b7280;
-            font-size: 0.875rem;
-            cursor: pointer;
-        }
-
-        [data-theme="dark"] .form-check-label {
-            color: #9ca3af;
-        }
-
-        .forgot-link {
-            color: #10b981;
-            font-size: 0.875rem;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
-        }
-
         /* Submit Button */
         .btn-login {
             width: 100%;
-            padding: 1rem;
+            padding: 0.85rem;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none;
             border-radius: 12px;
@@ -425,7 +372,7 @@
         .divider {
             display: flex;
             align-items: center;
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             color: #9ca3af;
             font-size: 0.875rem;
         }
@@ -490,12 +437,41 @@
             }
 
             .right-section {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem 1.25rem;
             }
 
             .theme-toggle {
                 top: 1rem;
                 right: 1rem;
+            }
+        }
+
+        @media (max-height: 800px) {
+            .right-section {
+                padding: 1.25rem;
+            }
+
+            .form-heading h1 {
+                font-size: 1.75rem;
+            }
+
+            .form-heading {
+                margin-bottom: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 0.85rem;
+            }
+
+            .divider {
+                margin: 0.85rem 0;
+            }
+
+            .theme-toggle {
+                top: 1.5rem;
+                right: 1.5rem;
+                width: 44px;
+                height: 44px;
             }
         }
 
@@ -536,12 +512,12 @@
 
             <!-- Main Content -->
             <div class="illustration-content">
-                <h2>Selamat Datang!</h2>
-                <p>Kelola tugas harianmu dengan mudah dan tingkatkan produktivitasmu bersama FocusDay</p>
+                <h2>Mulai Sekarang!</h2>
+                <p>Buat akun untuk mulai mengelola tugas harianmu dan tingkatkan produktivitas bersama FocusDay</p>
             </div>
         </div>
 
-        <!-- RIGHT SECTION - LOGIN FORM -->
+        <!-- RIGHT SECTION - REGISTER FORM -->
         <div class="right-section">
             <!-- Theme Toggle - Top Right -->
             <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
@@ -552,12 +528,12 @@
             <div class="login-form-container">
                 <!-- Form Heading -->
                 <div class="form-heading">
-                    <h1>Masuk</h1>
-                    <p>Masukkan kredensial Anda untuk melanjutkan</p>
+                    <h1>Buat Akun</h1>
+                    <p>Lengkapi data Anda untuk melanjutkan</p>
                 </div>
 
-                <!-- Login Form -->
-                <form id="loginForm" action="{{ route('home') }}" method="GET">
+                <!-- Register Form -->
+                <form id="registerForm" action="{{ route('home') }}" method="GET">
                     <!-- Username -->
                     <div class="form-group">
                         <label class="form-label" for="username">Username</label>
@@ -568,6 +544,20 @@
                                 id="username" 
                                 name="username"
                                 placeholder="Masukkan username"
+                                required>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                id="email" 
+                                name="email"
+                                placeholder="Masukkan email"
                                 required>
                         </div>
                     </div>
@@ -583,24 +573,32 @@
                                 name="password"
                                 placeholder="Masukkan password"
                                 required>
-                            <span class="password-toggle" onclick="togglePassword()">
+                            <span class="password-toggle" onclick="togglePassword('password', 'toggleIcon')">
                                 <i class="bi bi-eye" id="toggleIcon"></i>
                             </span>
                         </div>
                     </div>
 
-                    <!-- Options -->
-                    <div class="form-options">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">Ingat saya</label>
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">Konfirmasi Password</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="confirmPassword" 
+                                name="confirm_password"
+                                placeholder="Ulangi password"
+                                required>
+                            <span class="password-toggle" onclick="togglePassword('confirmPassword', 'toggleIcon2')">
+                                <i class="bi bi-eye" id="toggleIcon2"></i>
+                            </span>
                         </div>
-                        <a href="#" class="forgot-link">Lupa password?</a>
                     </div>
 
                     <!-- Submit -->
-                    <button type="submit" class="btn-login" id="loginBtn">
-                        <span id="btnText">Masuk</span>
+                    <button type="submit" class="btn-login" id="registerBtn">
+                        <span id="btnText">Daftar</span>
                         <span class="spinner-border spinner-border-sm d-none" id="btnSpinner"></span>
                     </button>
                 </form>
@@ -610,9 +608,9 @@
                     <span>atau</span>
                 </div>
 
-                <!-- Sign Up Link -->
+                <!-- Sign In Link -->
                 <div class="signup-link">
-                    Belum punya akun? <a href="{{ route('register') }}">Buat akun</a>
+                    Sudah punya akun? <a href="{{ route('login') }}">Masuk</a>
                 </div>
             </div>
         </div>
@@ -623,9 +621,9 @@
     
     <script>
         // Toggle Password
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggleIcon');
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
@@ -671,8 +669,17 @@
         });
 
         // Form Submit
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const btn = document.getElementById('loginBtn');
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Konfirmasi password tidak sesuai.');
+                return;
+            }
+
+            const btn = document.getElementById('registerBtn');
             const btnText = document.getElementById('btnText');
             const btnSpinner = document.getElementById('btnSpinner');
             
