@@ -12,8 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap 5.3.2 (Versi lebih stabil dari layout lama) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -745,53 +744,46 @@
         </main>
     </div>
     
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Layout Logic -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('themeToggle');
+        const themeToggle = document.getElementById('themeToggle');
 
-    if (themeToggle) {
-        const root = document.documentElement;
-        const savedTheme = localStorage.getItem('theme');
+        if (themeToggle) {
+            const root = document.documentElement;
+            const savedTheme = localStorage.getItem('theme');
 
-        // Set tema awal
-        if (savedTheme) {
-            root.setAttribute('data-theme', savedTheme);
-        } else {
-            // Default ke light mode
-            root.setAttribute('data-theme', 'light');
-        }
+            if (savedTheme) {
+                root.setAttribute('data-theme', savedTheme);
+            } else {
+                root.setAttribute('data-theme', 'light');
+            }
 
-        // Fungsi update icon (LOGIKA DIPERBAIKI)
-        const updateIcon = () => {
-            const current = root.getAttribute('data-theme');
-            const icon = themeToggle.querySelector('i');
-            if (!icon) return;
+            const updateIcon = () => {
+                const current = root.getAttribute('data-theme');
+                const icon = themeToggle.querySelector('i');
+                if (!icon) return;
 
             // LOGIKA BARU:
             // Mode terang (light) -> icon MATAHARI (sun) karena klik akan ke dark
             // Mode gelap (dark) -> icon BULAN (moon) karena klik akan ke light
-            if (current === 'dark') {
-                icon.className = 'bi bi-moon'; // Mode gelap: bulan
-                icon.setAttribute('aria-label', 'Switch to light mode');
-            } else {
-                icon.className = 'bi bi-sun'; // Mode light: matahari
-                icon.setAttribute('aria-label', 'Switch to dark mode');
-            }
-        };
+                if (current === 'dark') {
+                    icon.className = 'bi bi-moon'; // Mode gelap: bulan
+                    icon.setAttribute('aria-label', 'Switch to light mode');
+                } else {
+                    icon.className = 'bi bi-sun'; // Mode light: matahari
+                    icon.setAttribute('aria-label', 'Switch to dark mode');
+                }
+            };
 
-        updateIcon();
-
-        themeToggle.addEventListener('click', function() {
-            const current = root.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            root.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
             updateIcon();
-        });
+
+            themeToggle.addEventListener('click', function() {
+                const current = root.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                updateIcon();
+            });
     }
     
     // ========================
