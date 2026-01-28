@@ -49,7 +49,7 @@
         <!-- KOLOM KANAN: OPSI PENGATURAN -->
         <div class="col-lg-8">
 
-            <div class="collapse mb-4" id="editProfileCollapse">
+            <div class="mb-4 d-none" id="editProfileCollapse">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-0 py-3">
                         <h6 class="fw-bold mb-0 text-dark">
@@ -84,7 +84,7 @@
                 </div>
             </div>
 
-            <div class="collapse mb-4" id="changePasswordCollapse">
+            <div class="mb-4 d-none" id="changePasswordCollapse">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-0 py-3">
                         <h6 class="fw-bold mb-0 text-dark">
@@ -97,7 +97,12 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-dark" for="currentPassword">Password Lama</label>
-                                <input id="currentPassword" type="password" class="form-control" name="current_password" required>
+                                <div class="position-relative">
+                                    <input id="currentPassword" type="password" class="form-control" name="current_password" required>
+                                    <span class="password-toggle" onclick="toggleCurrentPassword()">
+                                        <i class="bi bi-eye" id="toggleCurrentPasswordIcon"></i>
+                                    </span>
+                                </div>
                                 @error('current_password')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
@@ -105,7 +110,12 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-dark" for="newPassword">Password Baru</label>
-                                <input id="newPassword" type="password" class="form-control" name="password" required>
+                                <div class="position-relative">
+                                    <input id="newPassword" type="password" class="form-control" name="password" required>
+                                    <span class="password-toggle" onclick="toggleNewPassword()">
+                                        <i class="bi bi-eye" id="toggleNewPasswordIcon"></i>
+                                    </span>
+                                </div>
                                 @error('password')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
@@ -113,7 +123,12 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-dark" for="newPasswordConfirmation">Konfirmasi Password Baru</label>
-                                <input id="newPasswordConfirmation" type="password" class="form-control" name="password_confirmation" required>
+                                <div class="position-relative">
+                                    <input id="newPasswordConfirmation" type="password" class="form-control" name="password_confirmation" required>
+                                    <span class="password-toggle" onclick="toggleNewPasswordConfirmation()">
+                                        <i class="bi bi-eye" id="toggleNewPasswordConfirmationIcon"></i>
+                                    </span>
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-end">
@@ -243,6 +258,20 @@
     .rounded-circle:hover {
         transform: scale(1.05);
     }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6b7280;
+        transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+        color: #10b981;
+    }
 </style>
 @endpush
 
@@ -288,21 +317,50 @@
     const editProfileCollapseEl = document.getElementById('editProfileCollapse');
     const changePasswordCollapseEl = document.getElementById('changePasswordCollapse');
 
-    if (editProfileBtn && changePasswordBtn && editProfileCollapseEl && changePasswordCollapseEl && window.bootstrap) {
-        const editProfileCollapse = new bootstrap.Collapse(editProfileCollapseEl, { toggle: false });
-        const changePasswordCollapse = new bootstrap.Collapse(changePasswordCollapseEl, { toggle: false });
+    if (editProfileBtn && changePasswordBtn && editProfileCollapseEl && changePasswordCollapseEl) {
+        const togglePanel = (panelEl) => {
+            panelEl.classList.toggle('d-none');
+        };
 
         editProfileBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            editProfileCollapse.toggle();
+            togglePanel(editProfileCollapseEl);
         });
 
         changePasswordBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            changePasswordCollapse.toggle();
+            togglePanel(changePasswordCollapseEl);
         });
+    }
+
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (!input || !icon) return;
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+
+    function toggleCurrentPassword() {
+        togglePassword('currentPassword', 'toggleCurrentPasswordIcon');
+    }
+
+    function toggleNewPassword() {
+        togglePassword('newPassword', 'toggleNewPasswordIcon');
+    }
+
+    function toggleNewPasswordConfirmation() {
+        togglePassword('newPasswordConfirmation', 'toggleNewPasswordConfirmationIcon');
     }
 </script>
 @endpush
