@@ -51,3 +51,8 @@ Route::get('/settings', function () {
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
+
+// Register Page - Halaman Registrasi
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');

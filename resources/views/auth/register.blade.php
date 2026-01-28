@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - FocusDay</title>
+    <title>Register - FocusDay</title>
     
     <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -344,59 +344,6 @@
             color: #10b981;
         }
 
-        /* Options */
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-check-input {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #d1d5db;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        [data-theme="dark"] .form-check-input {
-            border-color: #4b5563;
-            background: #374151;
-        }
-
-        .form-check-input:checked {
-            background-color: #10b981;
-            border-color: #10b981;
-        }
-
-        .form-check-label {
-            color: #6b7280;
-            font-size: 0.875rem;
-            cursor: pointer;
-        }
-
-        [data-theme="dark"] .form-check-label {
-            color: #9ca3af;
-        }
-
-        .forgot-link {
-            color: #10b981;
-            font-size: 0.875rem;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
-        }
-
         /* Submit Button */
         .btn-login {
             width: 100%;
@@ -536,12 +483,12 @@
 
             <!-- Main Content -->
             <div class="illustration-content">
-                <h2>Selamat Datang!</h2>
-                <p>Kelola tugas harianmu dengan mudah dan tingkatkan produktivitasmu bersama FocusDay</p>
+                <h2>Mulai Sekarang!</h2>
+                <p>Buat akun untuk mulai mengelola tugas harianmu dan tingkatkan produktivitas bersama FocusDay</p>
             </div>
         </div>
 
-        <!-- RIGHT SECTION - LOGIN FORM -->
+        <!-- RIGHT SECTION - REGISTER FORM -->
         <div class="right-section">
             <!-- Theme Toggle - Top Right -->
             <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
@@ -552,12 +499,12 @@
             <div class="login-form-container">
                 <!-- Form Heading -->
                 <div class="form-heading">
-                    <h1>Masuk</h1>
-                    <p>Masukkan kredensial Anda untuk melanjutkan</p>
+                    <h1>Buat Akun</h1>
+                    <p>Lengkapi data Anda untuk melanjutkan</p>
                 </div>
 
-                <!-- Login Form -->
-                <form id="loginForm" action="{{ route('home') }}" method="GET">
+                <!-- Register Form -->
+                <form id="registerForm" action="{{ route('home') }}" method="GET">
                     <!-- Username -->
                     <div class="form-group">
                         <label class="form-label" for="username">Username</label>
@@ -568,6 +515,20 @@
                                 id="username" 
                                 name="username"
                                 placeholder="Masukkan username"
+                                required>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                id="email" 
+                                name="email"
+                                placeholder="Masukkan email"
                                 required>
                         </div>
                     </div>
@@ -583,24 +544,32 @@
                                 name="password"
                                 placeholder="Masukkan password"
                                 required>
-                            <span class="password-toggle" onclick="togglePassword()">
+                            <span class="password-toggle" onclick="togglePassword('password', 'toggleIcon')">
                                 <i class="bi bi-eye" id="toggleIcon"></i>
                             </span>
                         </div>
                     </div>
 
-                    <!-- Options -->
-                    <div class="form-options">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">Ingat saya</label>
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">Konfirmasi Password</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="confirmPassword" 
+                                name="confirm_password"
+                                placeholder="Ulangi password"
+                                required>
+                            <span class="password-toggle" onclick="togglePassword('confirmPassword', 'toggleIcon2')">
+                                <i class="bi bi-eye" id="toggleIcon2"></i>
+                            </span>
                         </div>
-                        <a href="#" class="forgot-link">Lupa password?</a>
                     </div>
 
                     <!-- Submit -->
-                    <button type="submit" class="btn-login" id="loginBtn">
-                        <span id="btnText">Masuk</span>
+                    <button type="submit" class="btn-login" id="registerBtn">
+                        <span id="btnText">Daftar</span>
                         <span class="spinner-border spinner-border-sm d-none" id="btnSpinner"></span>
                     </button>
                 </form>
@@ -610,9 +579,9 @@
                     <span>atau</span>
                 </div>
 
-                <!-- Sign Up Link -->
+                <!-- Sign In Link -->
                 <div class="signup-link">
-                    Belum punya akun? <a href="{{ route('register') }}">Buat akun</a>
+                    Sudah punya akun? <a href="{{ route('login') }}">Masuk</a>
                 </div>
             </div>
         </div>
@@ -623,9 +592,9 @@
     
     <script>
         // Toggle Password
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggleIcon');
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
@@ -671,8 +640,17 @@
         });
 
         // Form Submit
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const btn = document.getElementById('loginBtn');
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Konfirmasi password tidak sesuai.');
+                return;
+            }
+
+            const btn = document.getElementById('registerBtn');
             const btnText = document.getElementById('btnText');
             const btnSpinner = document.getElementById('btnSpinner');
             
