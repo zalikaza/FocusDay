@@ -532,18 +532,31 @@
                     <p>Lengkapi data Anda untuk melanjutkan</p>
                 </div>
 
+                @if ($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <!-- Register Form -->
-                <form id="registerForm" action="{{ route('home') }}" method="GET">
+                <form id="registerForm" action="{{ route('register.store') }}" method="POST">
+                    @csrf
+
                     <!-- Username -->
                     <div class="form-group">
-                        <label class="form-label" for="username">Username</label>
+                        <label class="form-label" for="name">Username</label>
                         <div class="input-wrapper">
                             <input 
                                 type="text" 
                                 class="form-control" 
-                                id="username" 
-                                name="username"
+                                id="name" 
+                                name="name"
                                 placeholder="Masukkan username"
+                                value="{{ old('name') }}"
                                 required>
                         </div>
                     </div>
@@ -558,6 +571,7 @@
                                 id="email" 
                                 name="email"
                                 placeholder="Masukkan email"
+                                value="{{ old('email') }}"
                                 required>
                         </div>
                     </div>
@@ -587,7 +601,7 @@
                                 type="password" 
                                 class="form-control" 
                                 id="confirmPassword" 
-                                name="confirm_password"
+                                name="password_confirmation"
                                 placeholder="Ulangi password"
                                 required>
                             <span class="password-toggle" onclick="togglePassword('confirmPassword', 'toggleIcon2')">
@@ -670,15 +684,6 @@
 
         // Form Submit
         document.getElementById('registerForm').addEventListener('submit', function(e) {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                alert('Konfirmasi password tidak sesuai.');
-                return;
-            }
-
             const btn = document.getElementById('registerBtn');
             const btnText = document.getElementById('btnText');
             const btnSpinner = document.getElementById('btnSpinner');
