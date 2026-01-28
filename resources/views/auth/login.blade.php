@@ -554,10 +554,16 @@
                 <div class="form-heading">
                     <h1>Masuk</h1>
                     <p>Masukkan kredensial Anda untuk melanjutkan</p>
+                    @if ($errors->has('login'))
+                        <div class="alert alert-danger mt-3 mb-0 p-2" style="font-size: 0.85rem;">
+                            {{ $errors->first('login') }}
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Login Form -->
-                <form id="loginForm" action="{{ route('home') }}" method="GET">
+                <form id="loginForm" action="{{ route('login.submit') }}" method="POST">
+                    @csrf
                     <!-- Username -->
                     <div class="form-group">
                         <label class="form-label" for="username">Username</label>
@@ -568,6 +574,7 @@
                                 id="username" 
                                 name="username"
                                 placeholder="Masukkan username"
+                                value="{{ old('username') }}"
                                 required>
                         </div>
                     </div>
