@@ -681,15 +681,15 @@
                 <div class="stats-content">
                     <div class="stat-item">
                         <span class="stat-label">Total</span>
-                        <span class="stat-value">5</span>
+                        <span class="stat-value" id="todayTotalTasks">0</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Selesai</span>
-                        <span class="stat-value success">1</span>
+                        <span class="stat-value success" id="todayCompletedTasks">0</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Pending</span>
-                        <span class="stat-value warning">4</span>
+                        <span class="stat-value warning" id="todayPendingTasks">0</span>
                     </div>
                 </div>
             </div>
@@ -811,13 +811,44 @@
         window.updateSidebarBadgeFromStorage();
     };
     
-    // Panggil saat halaman dimuat untuk menampilkan badge dari localStorage
+    // ========================
+    // GLOBAL TODAY STATS WIDGET LOGIC
+    // ========================
+    window.updateTodayStatsFromStorage = function() {
+        const totalEl = document.getElementById('todayTotalTasks');
+        const completedEl = document.getElementById('todayCompletedTasks');
+        const pendingEl = document.getElementById('todayPendingTasks');
+
+        if (!totalEl || !completedEl || !pendingEl) return;
+
+        try {
+            const raw = localStorage.getItem('focusday.todayStats');
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+
+            const total = parseInt(parsed.total ?? 0);
+            const completed = parseInt(parsed.completed ?? 0);
+            const pending = parseInt(parsed.pending ?? 0);
+
+            totalEl.textContent = isNaN(total) ? '0' : total.toString();
+            completedEl.textContent = isNaN(completed) ? '0' : completed.toString();
+            pendingEl.textContent = isNaN(pending) ? '0' : pending.toString();
+        } catch (e) {
+            // Abaikan error parsing / akses localStorage
+        }
+    };
+
+    // Panggil saat halaman dimuat untuk menampilkan badge & statistik dari localStorage
     window.updateSidebarBadgeFromStorage();
+    window.updateTodayStatsFromStorage();
     
     // Listen untuk perubahan localStorage dari tab/halaman lain
     window.addEventListener('storage', function(e) {
         if (e.key === 'focusday.pendingTasks') {
             window.updateSidebarBadgeFromStorage();
+        }
+        if (e.key === 'focusday.todayStats') {
+            window.updateTodayStatsFromStorage();
         }
     });
 });

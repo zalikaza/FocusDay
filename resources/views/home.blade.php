@@ -808,6 +808,9 @@
         
         // Update sidebar badge secara realtime
         updateSidebarBadge();
+
+        // Update widget Statistik Hari Ini di sidebar
+        updateTodayStatsFromDOM();
     }
     
     function updateSidebarBadge() {
@@ -843,6 +846,36 @@
             completedSection.style.display = 'block';
         } else {
             completedSection.style.display = 'none';
+        }
+    }
+
+    // ========================
+    // TODAY STATS WIDGET LOGIC
+    // ========================
+    function updateTodayStatsFromDOM() {
+        const totalEl = document.getElementById('todayTotalTasks');
+        const completedEl = document.getElementById('todayCompletedTasks');
+        const pendingEl = document.getElementById('todayPendingTasks');
+
+        // Jika elemen tidak ada (misalnya di halaman lain), cukup keluar
+        if (!totalEl || !completedEl || !pendingEl) return;
+
+        const activeTasks = document.querySelectorAll('#activeTasksList .task-item').length;
+        const completedTasks = document.querySelectorAll('#completedTasksList .task-item').length;
+
+        const total = activeTasks + completedTasks;
+        const pending = activeTasks; // pada layout ini, "pending" = tugas yang masih aktif
+
+        totalEl.textContent = total.toString();
+        completedEl.textContent = completedTasks.toString();
+        pendingEl.textContent = pending.toString();
+
+        // Simpan ke localStorage agar bisa dibaca di halaman lain
+        try {
+            const todayStats = { total, completed: completedTasks, pending };
+            localStorage.setItem('focusday.todayStats', JSON.stringify(todayStats));
+        } catch (e) {
+            // Abaikan error localStorage (misalnya mode private)
         }
     }
 
@@ -1164,22 +1197,11 @@
         const toast = new bootstrap.Toast(document.getElementById('successToast'));
         toast.show();
         
-        const totalValue = document.querySelector('.stat-value:not(.success):not(.warning)');
-        const pendingValue = document.querySelector('.stat-value.warning');
-        if (totalValue && pendingValue) {
-            totalValue.textContent = parseInt(totalValue.textContent) + 1;
-            pendingValue.textContent = parseInt(pendingValue.textContent) + 1;
-        }
-
-        const submitBtn = document.getElementById('submitTaskBtn');
-        const originalHTML = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Berhasil!';
-        submitBtn.disabled = true;
-        setTimeout(() => { submitBtn.innerHTML = originalHTML; submitBtn.disabled = false; }, 2000);
-        console.log('Task added:', taskData);
-        
         // Update sidebar badge setelah menambah task baru
         updateSidebarBadge();
+
+        // Pastikan widget Statistik Hari Ini ikut ter-update
+        updateTodayStatsFromDOM();
     }
 
     // ========================
@@ -1188,17 +1210,19 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize semua komponen
         initializeTaskCheckboxes();
-        updateTaskCounters();
-        updateCompletedSectionVisibility();
         updateDateDisplay();
         loadCategoryOptionsFromStorage();
-        
-        // Set initial state untuk task yang sudah checked
+
+        // Set initial state untuk task yang sudah checked (pindahkan dulu ke section Terselesaikan)
         document.querySelectorAll('.task-checkbox:checked').forEach(checkbox => {
             const taskItem = checkbox.closest('.task-item');
             const taskId = taskItem.getAttribute('data-task-id');
             moveTaskToCompleted(taskItem, taskId);
         });
+
+        // Setelah posisi task benar, baru hitung ulang counter dan statistik
+        updateCompletedSectionVisibility();
+        updateTaskCounters();
         
         // Modal focus
         const modal = document.getElementById('addTaskModal');
