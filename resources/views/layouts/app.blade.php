@@ -14,7 +14,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Bootstrap 5.3.2 (Versi lebih stabil dari layout lama) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -309,12 +310,19 @@
         }
 
         /* --- Mobile Responsive --- */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .sidebar-container {
-                position: relative;
-                width: 100%;
-                min-height: auto;
-                transform: none;
+                position: fixed;
+                left: -100%;
+                width: 280px;
+                z-index: 1050;
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: none;
+            }
+            
+            .sidebar-container.mobile-open {
+                left: 0;
+                box-shadow: 8px 0 24px rgba(0, 0, 0, 0.15);
             }
             
             .main-content {
@@ -324,6 +332,100 @@
             .profile-btn .profile-meta {
                 display: none;
             }
+            
+            /* Hamburger Menu Button */
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+            
+            /* Mobile Overlay */
+            .mobile-overlay {
+                display: block;
+            }
+            
+            .mobile-overlay.active {
+                opacity: 1;
+                pointer-events: all;
+            }
+        }
+        
+        /* Desktop - sembunyikan hamburger */
+        @media (min-width: 993px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+            
+            .mobile-overlay {
+                display: none;
+            }
+        }
+        
+        /* Hamburger Button */
+        .mobile-menu-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--sidebar-border);
+            background: white;
+            color: var(--sidebar-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        html[data-theme="dark"] .mobile-menu-btn {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .mobile-menu-btn:hover {
+            background: var(--sidebar-hover);
+            color: var(--primary-green);
+        }
+        
+        /* Mobile Overlay Backdrop */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Close Button di Sidebar Mobile */
+        .sidebar-close-btn {
+            display: none;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--sidebar-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar-close-btn {
+                display: flex;
+            }
+        }
+        
+        .sidebar-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--primary-green);
         }
 
         /* --- Common Components --- */
@@ -582,13 +684,127 @@
         html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
             background: #475569;
         }
+        
+        /* ============================================
+           MOBILE RESPONSIVE IMPROVEMENTS
+           ============================================ */
+        
+        @media (max-width: 576px) {
+            /* Reduce main content padding on mobile */
+            .main-content main {
+                padding: 1rem !important;
+            }
+            
+            /* Smaller headings */
+            h1, .h1 { font-size: 1.75rem !important; }
+            h2, .h2 { font-size: 1.5rem !important; }
+            h3, .h3 { font-size: 1.25rem !important; }
+            h4, .h4 { font-size: 1.1rem !important; }
+            h5, .h5 { font-size: 1rem !important; }
+            
+            /* Cards more compact */
+            .card-body {
+                padding: 1rem !important;
+            }
+            
+            /* Navbar adjustments */
+            .top-navbar {
+                height: 56px;
+            }
+            
+            .top-navbar .container-fluid {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            /* Button sizing */
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            
+            .btn-lg {
+                padding: 0.625rem 1rem;
+                font-size: 1rem;
+            }
+            
+            /* Stats widget dalam sidebar - lebih compact */
+            .today-stats {
+                padding: 0.75rem;
+                margin-top: 1rem;
+            }
+            
+            .stat-value {
+                font-size: 1rem;
+            }
+            
+            /* Form controls */
+            .form-control, .form-select {
+                font-size: 1rem; /* Prevent auto-zoom on iOS */
+            }
+            
+            /* Modal improvements */
+            .modal-dialog {
+                margin: 0.5rem;
+                max-width: calc(100% - 1rem);
+            }
+            
+            .modal-body {
+                padding: 1rem !important;
+                max-height: 60vh !important;
+            }
+            
+            .modal-header, .modal-footer {
+                padding: 0.75rem 1rem !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* Stack columns on tablet */
+            .col-md-6 {
+                margin-bottom: 1rem;
+            }
+            
+            /* Reduce container padding */
+            .container-fluid {
+                padding-left: 1rem;
+                padding-right: 1rem; 
+            }
+            
+            /* Flex direction untuk header actions */
+            .d-flex.justify-content-between {
+                gap: 0.75rem;
+            }
+        }
+        
+        /* Improve touch targets for mobile */
+        @media (max-width: 992px) {
+            .btn, .icon-btn, .nav-link {
+                min-height: 44px; /* Apple's recommended touch target */
+                min-width: 44px;
+            }
+            
+            /* Make badges more visible */
+            .badge {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.6rem;
+            }
+        }
     </style>
     
     @stack('styles')
 </head>
 <body>
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
     <!-- Sidebar -->
     <div class="sidebar-container" id="sidebar">
+        <!-- Close Button (Mobile Only) -->
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        
         <!-- Logo & Toggle -->
         <div class="sidebar-logo">
             <a href="{{ route('home') }}" class="logo-wrapper">
@@ -703,6 +919,13 @@
     <div class="main-content">
         <nav class="navbar top-navbar sticky-top">
             <div class="container-fluid px-4">
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Mobile Menu Button (Hamburger) -->
+                    <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+                        <i class="bi bi-list" style="font-size: 1.5rem;"></i>
+                    </button>
+                </div>
+                
                 <div class="ms-auto d-flex align-items-center gap-2">
                     <button type="button" class="icon-btn" id="themeToggle" aria-label="Toggle theme">
                         <i class="bi bi-moon"></i>
@@ -746,47 +969,98 @@
         </main>
     </div>
     
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Layout Logic -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const themeToggle = document.getElementById('themeToggle');
+    const themeToggle = document.getElementById('themeToggle');
 
-        if (themeToggle) {
-            const root = document.documentElement;
-            const savedTheme = localStorage.getItem('theme');
+    if (themeToggle) {
+        const root = document.documentElement;
+        const savedTheme = localStorage.getItem('theme');
 
-            if (savedTheme) {
-                root.setAttribute('data-theme', savedTheme);
-            } else {
-                root.setAttribute('data-theme', 'light');
-            }
+        // Set tema awal
+        if (savedTheme) {
+            root.setAttribute('data-theme', savedTheme);
+        } else {
+            // Default ke light mode
+            root.setAttribute('data-theme', 'light');
+        }
 
-            const updateIcon = () => {
-                const current = root.getAttribute('data-theme');
-                const icon = themeToggle.querySelector('i');
-                if (!icon) return;
+        // Fungsi update icon (LOGIKA DIPERBAIKI)
+        const updateIcon = () => {
+            const current = root.getAttribute('data-theme');
+            const icon = themeToggle.querySelector('i');
+            if (!icon) return;
 
             // LOGIKA BARU:
             // Mode terang (light) -> icon MATAHARI (sun) karena klik akan ke dark
             // Mode gelap (dark) -> icon BULAN (moon) karena klik akan ke light
-                if (current === 'dark') {
-                    icon.className = 'bi bi-moon'; // Mode gelap: bulan
-                    icon.setAttribute('aria-label', 'Switch to light mode');
-                } else {
-                    icon.className = 'bi bi-sun'; // Mode light: matahari
-                    icon.setAttribute('aria-label', 'Switch to dark mode');
-                }
-            };
+            if (current === 'dark') {
+                icon.className = 'bi bi-moon'; // Mode gelap: bulan
+                icon.setAttribute('aria-label', 'Switch to light mode');
+            } else {
+                icon.className = 'bi bi-sun'; // Mode light: matahari
+                icon.setAttribute('aria-label', 'Switch to dark mode');
+            }
+        };
 
+        updateIcon();
+
+        themeToggle.addEventListener('click', function() {
+            const current = root.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
             updateIcon();
-
-            themeToggle.addEventListener('click', function() {
-                const current = root.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                root.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
-                updateIcon();
-            });
+        });
     }
+    
+    // ========================
+    // MOBILE SIDEBAR TOGGLE
+    // ========================
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+    const sidebar = document.getElementById('sidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    
+    // Function to open sidebar
+    function openSidebar() {
+        sidebar.classList.add('mobile-open');
+        mobileOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+    
+    // Function to close sidebar
+    function closeSidebar() {
+        sidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+    
+    // Event listeners
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', openSidebar);
+    }
+    
+    if (sidebarCloseBtn) {
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+    }
+    
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', closeSidebar);
+    }
+    
+    // Close sidebar on navigation link click (mobile)
+    document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 992) {
+                closeSidebar();
+            }
+        });
+    });
     
     // ========================
     // GLOBAL SIDEBAR BADGE LOGIC

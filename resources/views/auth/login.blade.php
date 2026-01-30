@@ -479,12 +479,27 @@
             }
 
             .left-section {
-                min-height: 40vh;
-                padding: 2rem 1rem;
+                min-height: 35vh;
+                padding: 1.5rem 1rem;
+            }
+            
+            .left-logo {
+                top: 1.5rem;
+                left: 1.5rem;
+            }
+            
+            .left-logo .logo-icon {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .left-logo .brand-name {
+                font-size: 1.125rem;
             }
 
             .illustration-content h2 {
                 font-size: 1.75rem;
+                margin-bottom: 0.75rem;
             }
 
             .illustration-content p {
@@ -492,12 +507,56 @@
             }
 
             .right-section {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem 1rem;
             }
 
             .theme-toggle {
                 top: 1rem;
                 right: 1rem;
+                width: 44px;
+                height: 44px;
+            }
+            
+            .login-form-container {
+                max-width: 100%;
+            }
+            
+            .form-heading h1 {
+                font-size: 1.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .left-section {
+                min-height: 30vh;
+                padding: 1rem;
+            }
+            
+            .illustration-content h2 {
+                font-size: 1.5rem;
+            }
+            
+            .illustration-content p {
+                font-size: 0.875rem;
+                padding: 0 1rem;
+            }
+            
+            .right-section {
+                padding: 1rem;
+            }
+            
+            .form-heading h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-control {
+                padding: 0.75rem 0.875rem;
+                font-size: 1rem; /* Prevent zoom on iOS */
+            }
+            
+            .btn-login {
+                padding: 0.875rem;
+                font-size: 0.95rem;
             }
         }
 

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('agendas', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('title');
-            $table->date('date');
+            $table->string('tamasya bersama emon');
+            $table->date('16 janiari');
         });
     }
 

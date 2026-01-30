@@ -7,15 +7,15 @@
     <!-- Header Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-start align-items-md-center flex-column flex-md-row">
-                <div class="mb-3 mb-md-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
                     <h2 class="fw-bold text-dark mb-1">Hari Ini</h2>
                     <p class="text-muted mb-0">
                         <i class="bi bi-calendar3 me-2"></i>
                         {{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
                     </p>
                 </div>
-                <!-- Tombol Style Baru (Hijau Solid) -->
+                <!-- Tombol Tambah Rencana (Sama dengan Kalender) -->
                 <button class="btn btn-success btn-add-task shadow-sm" data-bs-toggle="modal" data-bs-target="#addTaskModal">
                     <i class="bi bi-plus-circle me-2"></i>Tambah Rencana
                 </button>
@@ -50,7 +50,7 @@
                                             <input class="form-check-input task-checkbox" type="checkbox" id="task{{ $taskId }}" data-completed="{{ $isCompleted ? 'true' : 'false' }}" @checked($isCompleted)>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <label for="task{{ $taskId }}" class="task-title mb-1 {{ $isCompleted ? 'task-completed' : '' }}">{{ $title }}</label>
+                                            <label for="task{{ $taskId }}" class="task-title mb-1">{{ $title }}</label>
                                             @if($timeText)
                                                 <p class="text-muted small mb-0">
                                                     <i class="bi bi-clock me-1"></i>{{ $timeText }}
@@ -200,7 +200,7 @@
                                     <i class="bi bi-tag me-1"></i>{{ $category->nama_kategori }}
                                 </label>
                             @empty
-                                <span class="text-muted small">Belum ada kategori. Tambah kategori dulu.</span>
+                                <span class="text-muted small" id="emptyCategoryHint">Belum ada kategori. Tambah kategori dulu.</span>
                             @endforelse
                             
                             <div id="additionalCategories"></div>
@@ -301,8 +301,19 @@
                                id="newCategoryName" 
                                placeholder="Nama kategori baru"
                                style="border-radius: 8px 0 0 8px;">
-                        <button class="btn btn-outline-success" type="button" onclick="addNewCategory()" style="border-radius: 0 8px 8px 0;">
+                        <select class="form-select" id="newCategoryColor" aria-label="Pilih warna kategori" style="max-width: 140px;">
+                            <option value="biru" selected>Biru</option>
+                            <option value="hijau">Hijau</option>
+                            <option value="kuning">Kuning</option>
+                            <option value="ungu">Ungu</option>
+                            <option value="pink">Pink</option>
+                            <option value="abu-abu">Abu-abu</option>
+                        </select>
+                        <button class="btn btn-outline-success" type="button" onclick="addNewCategory()" aria-label="Simpan kategori" style="border-radius: 0;">
                             <i class="bi bi-check-lg"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" type="button" onclick="cancelAddCategory()" aria-label="Batal" style="border-radius: 0 8px 8px 0;">
+                            <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
                 </div>
@@ -565,7 +576,7 @@
     
     /* Color Teks Waktu (Adaptif) */
     html:not([data-theme="dark"]) .time-input-group input { color: #111827; }
-    html[data-theme="dark"] .time-input-group input { color: #ffffff; }
+    html[data-theme="dark"]) .time-input-group input { color: #ffffff; }
     
     .time-separator { opacity: 0.5; font-weight: 300; pointer-events: none; }
 
@@ -586,7 +597,7 @@
         animation: fadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
-    html[data-theme="dark"] .calendar-popup {
+    html[data-theme="dark"]) .calendar-popup {
         background: #1f2937;
         border-color: #374151;
     }
@@ -597,11 +608,11 @@
     
     /* Calendar Colors Adaptif */
     html:not([data-theme="dark"]) .calendar-month-title { color: #111827; }
-    html[data-theme="dark"] .calendar-month-title { color: #f3f4f6; }
+    html[data-theme="dark"]) .calendar-month-title { color: #f3f4f6; }
 
     .calendar-nav-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; transition: background 0.2s; color: #6b7280; }
     .calendar-nav-btn:hover { background: #f3f4f6; color: #111827; }
-    html[data-theme="dark"] .calendar-nav-btn:hover { background: #374151; color: white; }
+    html[data-theme="dark"]) .calendar-nav-btn:hover { background: #374151; color: white; }
 
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
     .calendar-day-label { font-size: 0.75rem; font-weight: 600; padding-bottom: 10px; text-transform: uppercase; color: #9ca3af; }
@@ -614,9 +625,9 @@
     html:not([data-theme="dark"]) .calendar-day.other-month { color: #e5e7eb; }
     
     /* Calendar Day Colors (Dark Mode) */
-    html[data-theme="dark"] .calendar-day { color: #d1d5db; }
-    html[data-theme="dark"] .calendar-day:hover:not(.selected) { background-color: #374151; }
-    html[data-theme="dark"] .calendar-day.other-month { color: #374151; }
+    html[data-theme="dark"]) .calendar-day { color: #d1d5db; }
+    html[data-theme="dark"]) .calendar-day:hover:not(.selected) { background-color: #374151; }
+    html[data-theme="dark"]) .calendar-day.other-month { color: #374151; }
 
     .calendar-day.selected { background-color: var(--primary-green) !important; color: white !important; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4); }
     .calendar-day.today { border: 2px solid var(--primary-green); }
@@ -638,7 +649,7 @@
         padding: 4px;
     }
     
-    html[data-theme="dark"] .time-dropdown {
+    html[data-theme="dark"]) .time-dropdown {
         background: #1f2937;
         border-color: #374151;
     }
@@ -649,8 +660,8 @@
     html:not([data-theme="dark"]) .time-option { color: #374151; }
     html:not([data-theme="dark"]) .time-option:hover { background-color: #f3f4f6; color: var(--primary-green); }
     
-    html[data-theme="dark"] .time-option { color: #e5e7eb; }
-    html[data-theme="dark"] .time-option:hover { background-color: #374151; color: var(--primary-green); }
+    html[data-theme="dark"]) .time-option { color: #e5e7eb; }
+    html[data-theme="dark"]) .time-option:hover { background-color: #374151; color: var(--primary-green); }
 
     .time-option.highlighted { background-color: var(--primary-green); color: white; }
 
@@ -667,49 +678,93 @@
     @media (max-width: 576px) {
         .datetime-wrapper { flex-direction: column; }
         .date-section, .time-section { width: 100%; flex: auto; }
+        
+        /* Header button responsiveness */
+        .row.mb-4 .btn-add-task {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            white-space: nowrap;
+        }
+        
+        .row.mb-4 h2 {
+            font-size: 1.5rem;
+        }
+        
+        .row.mb-4 p {
+            font-size: 0.85rem;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        /* Very small screens - compact button */
+        .row.mb-4 .btn-add-task {
+            font-size: 0.8rem;
+            padding: 0.45rem 0.6rem;
+        }
+        
+        .row.mb-4 .btn-add-task .bi {
+            display: none; /* Hide icon on very small screens */
+        }
     }
 </style>
 @endpush
 
+@push('scripts')
 <script>
     // ========================
-    // TASK STATUS SYNC (CHECKBOX DATABASE)
+    // TASK COMPLETION LOGIC
     // ========================
-    function syncTaskStatusToServer(taskId, isCompleted) {
-        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+    function initializeTaskCheckboxes() {
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const taskItem = this.closest('.task-item');
+                const taskTitle = taskItem.querySelector('.task-title');
+                const taskId = taskItem.getAttribute('data-task-id');
 
-        fetch("{{ url('/rencana') }}/" + taskId + "/status", {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify({ status: isCompleted ? 'selesai' : null }),
-        }).catch(() => {
-            // Untuk saat ini, abaikan error agar UX tetap halus
+                const isCompleted = this.checked === true;
+
+                if (isCompleted) {
+                    // Animasi fade out untuk berpindah
+                    taskItem.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    taskItem.style.opacity = '0.5';
+                    taskItem.style.transform = 'translateX(-10px)';
+                    
+                    setTimeout(() => {
+                        // Pindahkan task ke section Terselesaikan
+                        moveTaskToCompleted(taskItem, taskId);
+                        updateTaskCounters();
+                    }, 300);
+                } else {
+                    // Jika dicentang ulang, pindah kembali ke aktif
+                    taskTitle.classList.remove('task-completed');
+                    moveTaskToActive(taskItem, taskId);
+                    updateTaskCounters();
+                }
+
+                // Update status di database ("selesai" atau null)
+                updateTaskStatusOnServer(taskId, isCompleted);
+            });
         });
     }
 
     function moveTaskToCompleted(taskItem, taskId) {
         const completedList = document.getElementById('completedTasksList');
         const taskTitle = taskItem.querySelector('.task-title');
-
+        
         // Tambah class completed
         taskTitle.classList.add('task-completed');
-
+        
         // Update checkbox attribute
         const checkbox = taskItem.querySelector('.task-checkbox');
         checkbox.setAttribute('data-completed', 'true');
-
+        
         // Pindahkan ke list completed
         completedList.appendChild(taskItem);
-
+        
         // Tampilkan section Terselesaikan jika sebelumnya hidden
         const completedSection = document.getElementById('completedTasksSection');
         completedSection.style.display = 'block';
-
+        
         // Animasi fade in
         setTimeout(() => {
             taskItem.style.opacity = '1';
@@ -719,14 +774,14 @@
 
     function moveTaskToActive(taskItem, taskId) {
         const activeList = document.getElementById('activeTasksList');
-
+        
         // Update checkbox attribute
         const checkbox = taskItem.querySelector('.task-checkbox');
         checkbox.setAttribute('data-completed', 'false');
-
+        
         // Pindahkan ke list aktif
         activeList.appendChild(taskItem);
-
+        
         // Sembunyikan section Terselesaikan jika tidak ada task
         updateCompletedSectionVisibility();
     }
@@ -734,11 +789,11 @@
     function updateTaskCounters() {
         const activeTasks = document.querySelectorAll('#activeTasksList .task-item').length;
         const completedTasks = document.querySelectorAll('#completedTasksList .task-item').length;
-
+        
         // Update counters
         document.getElementById('activeTasksCount').textContent = `${activeTasks} Tugas`;
         document.getElementById('completedTasksCount').textContent = `${completedTasks} Tugas`;
-
+        
         // Tampilkan empty state jika tidak ada task aktif
         const emptyState = document.getElementById('emptyState');
         if (activeTasks === 0 && completedTasks === 0) {
@@ -746,21 +801,21 @@
         } else {
             emptyState.classList.add('d-none');
         }
-
+        
         // Update sidebar badge secara realtime
         updateSidebarBadge();
 
         // Update widget Statistik Hari Ini di sidebar
         updateTodayStatsFromDOM();
     }
-
+    
     function updateSidebarBadge() {
         const sidebarBadge = document.getElementById('sidebarBadge');
         if (!sidebarBadge) return;
-
+        
         // Hitung task yang belum selesai (pending) = task di activeTasksList yang checkboxnya TIDAK di-check
         const pendingTasks = document.querySelectorAll('#activeTasksList .task-item .task-checkbox:not(:checked)').length;
-
+        
         // Simpan ke localStorage agar bisa dibaca di halaman lain
         if (typeof window.savePendingTasksCount === 'function') {
             window.savePendingTasksCount(pendingTasks);
@@ -768,7 +823,7 @@
             // Fallback jika fungsi global belum tersedia
             localStorage.setItem('focusday.pendingTasks', pendingTasks.toString());
         }
-
+        
         if (pendingTasks > 0) {
             // Tampilkan badge dengan jumlah pending tasks
             sidebarBadge.textContent = pendingTasks;
@@ -782,12 +837,35 @@
     function updateCompletedSectionVisibility() {
         const completedSection = document.getElementById('completedTasksSection');
         const completedTasks = document.querySelectorAll('#completedTasksList .task-item').length;
-
+        
         if (completedTasks > 0) {
             completedSection.style.display = 'block';
         } else {
             completedSection.style.display = 'none';
         }
+    }
+
+    function updateTaskStatusOnServer(taskId, isCompleted) {
+        if (!taskId) return;
+
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        fetch("{{ route('rencana.updateStatus') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({
+                id: Number(taskId),
+                status: isCompleted ? 'selesai' : null,
+            }),
+        }).catch(() => {
+            // Kalau gagal, untuk sekarang cukup log di console; UI tetap jalan
+            console.error('Gagal memperbarui status tugas di server');
+        });
     }
 
     // ========================
@@ -823,45 +901,33 @@
     // ========================
     // FORM VALIDATION & UI
     // ========================
-    const taskFormEl = document.getElementById('taskForm');
-    if (taskFormEl) {
-        taskFormEl.addEventListener('submit', function(event) {
-            event.preventDefault();
-            if (!this.checkValidity()) { event.stopPropagation(); this.classList.add('was-validated'); return; }
-            if (typeof addTask === 'function') {
-                addTask();
-            }
-        });
-    }
-
-    const taskNotesEl = document.getElementById('taskNotes');
-    if (taskNotesEl) {
-        taskNotesEl.addEventListener('input', function() {
-            const charCount = document.getElementById('charCount');
-            if (charCount) charCount.textContent = this.value.length;
-        });
-    }
-
-    const noSpecificTimeEl = document.getElementById('noSpecificTime');
-    if (noSpecificTimeEl) {
-        noSpecificTimeEl.addEventListener('change', function() {
-            const wrapper = document.getElementById('datetimeSection');
-            const timeInputs = document.querySelectorAll('#startTimeInput, #endTimeInput');
-            if (this.checked) {
-                if (wrapper) wrapper.classList.add('disabled');
-                timeInputs.forEach(input => { input.value = ''; input.disabled = true; });
-            } else {
-                if (wrapper) wrapper.classList.remove('disabled');
-                timeInputs.forEach(input => {
-                    input.value = (input.id === 'startTimeInput' ? '7:30pm' : '8:30pm');
-                    input.disabled = false;
-                });
-            }
-        });
-    }
+    document.getElementById('taskForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (!this.checkValidity()) { event.stopPropagation(); this.classList.add('was-validated'); return; }
+        addTask();
+    });
+    
+    document.getElementById('taskNotes').addEventListener('input', function() {
+        document.getElementById('charCount').textContent = this.value.length;
+    });
+    
+    document.getElementById('noSpecificTime').addEventListener('change', function() {
+        const wrapper = document.getElementById('datetimeSection');
+        const timeInputs = document.querySelectorAll('#startTimeInput, #endTimeInput');
+        if (this.checked) {
+            wrapper.classList.add('disabled');
+            timeInputs.forEach(input => { input.value = ''; input.disabled = true; });
+        } else {
+            wrapper.classList.remove('disabled');
+            timeInputs.forEach(input => {
+                input.value = (input.id === 'startTimeInput' ? '7:30pm' : '8:30pm');
+                input.disabled = false;
+            });
+        }
+    });
 
     // ========================
-    // CATEGORY LOGIC (LOCALSTORAGE)
+    // CATEGORY LOGIC
     // ========================
     const STORAGE_KEY_CATEGORIES = 'focusday.categories';
 
@@ -893,86 +959,123 @@
         const additional = document.getElementById('additionalCategories');
         if (!additional) return;
 
+        const emptyHint = document.getElementById('emptyCategoryHint');
+        if (emptyHint) emptyHint.remove();
+
         const categoryId = 'category' + Date.now() + Math.floor(Math.random() * 1000);
         const newCategory = document.createElement('div');
-        newCategory.innerHTML = `<input type="radio" class="btn-check" name="taskCategory" id="${categoryId}" value="${category.key}" autocomplete="off"><label class="btn btn-sm btn-category" for="${categoryId}" style="background-color: ${category.bg}; color: ${category.text};"><i class="bi ${category.icon} me-1"></i>${category.label}</label>`;
+        const display = category && category.nama_kategori ? category.nama_kategori : 'Kategori';
+        const warnaRaw = category ? category.warna : null;
+        const lower = String(warnaRaw || '').trim().toLowerCase();
+        const map = {
+            'biru': { bg:'#dbeafe', text:'#1e40af' },
+            'blue': { bg:'#dbeafe', text:'#1e40af' },
+            'hijau': { bg:'#d1fae5', text:'#065f46' },
+            'green': { bg:'#d1fae5', text:'#065f46' },
+            'kuning': { bg:'#fef3c7', text:'#92400e' },
+            'yellow': { bg:'#fef3c7', text:'#92400e' },
+            'ungu': { bg:'#ede9fe', text:'#5b21b6' },
+            'purple': { bg:'#ede9fe', text:'#5b21b6' },
+            'pink': { bg:'#fce7f3', text:'#9d174d' },
+            'abu-abu': { bg:'#f3f4f6', text:'#374151' },
+            'gray': { bg:'#f3f4f6', text:'#374151' },
+            'grey': { bg:'#f3f4f6', text:'#374151' },
+        };
+        const style = map[lower] || { bg: '#f3f4f6', text: '#374151' };
+        const value = category && (category.kategori_id ?? category.id) ? (category.kategori_id ?? category.id) : '';
+        newCategory.innerHTML = `<input type="radio" class="btn-check" name="taskCategory" id="${categoryId}" value="${value}" autocomplete="off"><label class="btn btn-sm btn-category" for="${categoryId}" style="background-color: ${style.bg}; color: ${style.text};"><i class="bi bi-tag me-1"></i>${display}</label>`;
         additional.appendChild(newCategory);
+
+        const input = newCategory.querySelector('input[type="radio"]');
+        if (input) input.checked = true;
     }
 
     function loadCategoryOptionsFromStorage() {
         const additional = document.getElementById('additionalCategories');
         if (!additional) return;
         additional.innerHTML = '';
-
-        const custom = loadCustomCategories();
-        custom.forEach(cat => addCategoryOptionToHome(cat));
     }
 
     function showAddCategory() {
         const form = document.getElementById('addCategoryForm');
-        if (!form) return;
         form.classList.toggle('d-none');
-        if (!form.classList.contains('d-none')) {
-            const input = document.getElementById('newCategoryName');
-            if (input) input.focus();
-        }
+        if (!form.classList.contains('d-none')) document.getElementById('newCategoryName').focus();
     }
 
-    function addNewCategory() {
-        const input = document.getElementById('newCategoryName');
-        if (!input) return;
-        const categoryName = input.value.trim();
-        if (!categoryName) return alert('Mohon isi nama kategori');
-        const colors = [
-            {bg:'#fef3c7', text:'#92400e', icon:'bi-palette'},
-            {bg:'#e0e7ff', text:'#3730a3', icon:'bi-star'},
-            {bg:'#fce7f3', text:'#9d174d', icon:'bi-heart'}
-        ];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const key = slugify(categoryName) || ('kategori-' + Date.now());
-
-        const current = loadCustomCategories();
-        const exists = current.some(c => c.key === key || c.label.toLowerCase() === categoryName.toLowerCase());
-        if (!exists) {
-            current.push({ key, label: categoryName, bg: color.bg, text: color.text, icon: color.icon });
-            saveCustomCategories(current);
-        }
-
-        loadCategoryOptionsFromStorage();
-        input.value = '';
+    function cancelAddCategory() {
         const form = document.getElementById('addCategoryForm');
-        if (form) form.classList.add('d-none');
+        document.getElementById('newCategoryName').value = '';
+        const colorEl = document.getElementById('newCategoryColor');
+        if (colorEl) colorEl.value = 'biru';
+        form.classList.add('d-none');
+    }
+    
+    function addNewCategory() {
+        const categoryName = document.getElementById('newCategoryName').value.trim();
+        if (!categoryName) return alert('Mohon isi nama kategori');
+
+        const colorEl = document.getElementById('newCategoryColor');
+        const warna = colorEl ? colorEl.value : null;
+
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        fetch("{{ route('categories.store') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({ nama_kategori: categoryName, warna }),
+        }).then(async (response) => {
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || 'Gagal menambahkan kategori');
+            }
+            return response.json();
+        }).then((data) => {
+            if (!data || !data.success || !data.category) {
+                throw new Error('Gagal menambahkan kategori');
+            }
+
+            addCategoryOptionToHome(data.category);
+            cancelAddCategory();
+        }).catch(() => {
+            alert('Gagal menambahkan kategori. Silakan coba lagi.');
+        });
     }
 
     // ========================
-    // DATE & TIME PICKER LOGIC
+    // DATE WIDGET LOGIC (CENTERED)
     // ========================
     const dateDisplayBox = document.getElementById('dateDisplayBox');
     const dateText = document.getElementById('dateText');
     const calendarPopup = document.getElementById('calendarPopup');
     const calendarTitle = document.getElementById('calendarTitle');
     const calendarGrid = document.querySelector('.calendar-grid');
-
-    let currentDate = new Date();
+    
+    let currentDate = new Date(); 
     let selectedDate = new Date();
 
-    function updateDateDisplay() {
-        if (!dateText) return;
-        const options = { weekday: 'long', month: 'long', day: 'numeric' };
-        dateText.textContent = selectedDate.toLocaleDateString('en-US', options);
-    }
+    dateDisplayBox.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (document.getElementById('datetimeSection').classList.contains('disabled')) return;
+        const isOpen = calendarPopup.classList.contains('show');
+        closeAllPopups();
+        if (!isOpen) {
+            calendarPopup.classList.add('show');
+            dateDisplayBox.classList.add('active');
+            renderCalendar();
+        }
+    });
 
     function renderCalendar() {
-        if (!calendarGrid || !calendarTitle) return;
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        const monthNames = [
-            'January','February','March','April','May','June',
-            'July','August','September','October','November','December'
-        ];
-        calendarTitle.textContent = monthNames[month] + ' ' + year;
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        calendarTitle.textContent = `${monthNames[month]} ${year}`;
         calendarGrid.innerHTML = '<div class="calendar-day-label">Su</div><div class="calendar-day-label">Mo</div><div class="calendar-day-label">Tu</div><div class="calendar-day-label">We</div><div class="calendar-day-label">Th</div><div class="calendar-day-label">Fr</div><div class="calendar-day-label">Sa</div>';
-
         const firstDayIndex = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = new Date();
@@ -987,108 +1090,62 @@
             const dayEl = document.createElement('div');
             dayEl.classList.add('calendar-day');
             dayEl.textContent = i;
-            if (
-                i === selectedDate.getDate() &&
-                month === selectedDate.getMonth() &&
-                year === selectedDate.getFullYear()
-            ) {
-                dayEl.classList.add('selected');
-            }
-            if (
-                i === today.getDate() &&
-                month === today.getMonth() &&
-                year === today.getFullYear()
-            ) {
-                dayEl.classList.add('today');
-            }
+            if (i === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) dayEl.classList.add('selected');
+            if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) dayEl.classList.add('today');
             dayEl.addEventListener('click', (e) => {
                 e.stopPropagation();
                 selectedDate = new Date(year, month, i);
                 updateDateDisplay();
-                closeAllPopups();
+                calendarPopup.classList.remove('show');
+                dateDisplayBox.classList.remove('active');
             });
             calendarGrid.appendChild(dayEl);
         }
     }
 
-    if (dateDisplayBox) {
-        dateDisplayBox.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const datetimeSection = document.getElementById('datetimeSection');
-            if (datetimeSection && datetimeSection.classList.contains('disabled')) return;
-            const isOpen = calendarPopup && calendarPopup.classList.contains('show');
-            closeAllPopups();
-            if (!isOpen && calendarPopup) {
-                calendarPopup.classList.add('show');
-                dateDisplayBox.classList.add('active');
-                renderCalendar();
-            }
-        });
+    function updateDateDisplay() {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const parts = selectedDate.toLocaleDateString('en-US', options).split(',');
+        dateText.textContent = `${parts[0]}, ${parts[1]}`;
     }
+
+    document.getElementById('prevMonth').addEventListener('click', (e) => { e.stopPropagation(); currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+    document.getElementById('nextMonth').addEventListener('click', (e) => { e.stopPropagation(); currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+
+    // ========================
+    // TIME WIDGET LOGIC
+    // ========================
+    function generateTimeOptions() {
+        const times = [];
+        for (let i = 0; i < 24; i++) {
+            for (let j = 0; j < 60; j += 15) {
+                const hour = i; const minute = j;
+                const period = hour >= 12 ? 'pm' : 'am';
+                const displayHour = hour % 12 || 12;
+                const displayMinute = minute < 10 ? '0' + minute : minute;
+                times.push(`${displayHour}:${displayMinute}${period}`);
+            }
+        }
+        return times;
+    }
+    const timeOptions = generateTimeOptions();
 
     function setupTimePicker(inputId, dropdownId) {
         const input = document.getElementById(inputId);
         const dropdown = document.getElementById(dropdownId);
-        if (!input || !dropdown) return;
-
-        const times = [];
-        const ampm = ['am', 'pm'];
-        for (let h = 0; h < 24; h++) {
-            const hour12 = h % 12 === 0 ? 12 : h % 12;
-            const suffix = ampm[Math.floor(h / 12)];
-            times.push(hour12 + ':00' + suffix);
-            times.push(hour12 + ':30' + suffix);
-        }
-
-        function populateDropdown(options) {
-            dropdown.innerHTML = '';
-            options.forEach(time => {
-                const div = document.createElement('div');
-                div.className = 'time-option';
-                div.textContent = time;
-                if (time === input.value) div.classList.add('highlighted');
-                div.addEventListener('mouseover', function() {
-                    dropdown.querySelectorAll('.time-option').forEach(el => el.classList.remove('highlighted'));
-                    this.classList.add('highlighted');
-                });
-                div.addEventListener('click', () => {
-                    input.value = time;
-                    dropdown.classList.remove('show');
-                });
-                dropdown.appendChild(div);
-            });
-        }
-
-        function filterDropdown(query) {
-            const options = dropdown.querySelectorAll('.time-option');
-            const lowerQuery = query.toLowerCase();
-            let firstVisible = null;
-            options.forEach(opt => {
-                const text = opt.textContent.toLowerCase();
-                if (text.includes(lowerQuery)) {
-                    opt.style.display = 'block';
-                    if (!firstVisible) firstVisible = opt;
-                } else {
-                    opt.style.display = 'none';
-                }
-                opt.classList.remove('highlighted');
-            });
-            if (firstVisible) {
-                firstVisible.classList.add('highlighted');
-                firstVisible.scrollIntoView({ block: 'nearest' });
-            }
-        }
+        populateDropdown(dropdown, timeOptions, input);
 
         input.addEventListener('focus', (e) => {
             e.stopPropagation();
-            populateDropdown(times);
+            if (document.getElementById('datetimeSection').classList.contains('disabled')) return;
+            document.querySelectorAll('.time-dropdown').forEach(d => { if(d !== dropdown) d.classList.remove('show'); });
             dropdown.classList.add('show');
+            input.parentElement.classList.add('active');
+            filterDropdown(input.value, dropdown);
         });
 
-        input.addEventListener('input', (e) => {
-            filterDropdown(e.target.value);
-        });
-
+        input.addEventListener('input', (e) => { filterDropdown(e.target.value, dropdown); });
+        
         input.addEventListener('keydown', (e) => {
             const highlighted = dropdown.querySelector('.time-option.highlighted');
             if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -1098,18 +1155,14 @@
                 if (e.key === 'ArrowDown') currentIndex = (currentIndex + 1) % options.length;
                 if (e.key === 'ArrowUp') currentIndex = (currentIndex - 1 + options.length) % options.length;
                 options.forEach(opt => opt.classList.remove('highlighted'));
-                if (options[currentIndex]) {
+                if(options[currentIndex]) {
                     options[currentIndex].classList.add('highlighted');
                     options[currentIndex].scrollIntoView({ block: 'nearest' });
                 }
             } else if (e.key === 'Enter') {
                 e.preventDefault();
-                if (highlighted) {
-                    input.value = highlighted.textContent;
-                    dropdown.classList.remove('show');
-                } else {
-                    dropdown.classList.remove('show');
-                }
+                if (highlighted) { input.value = highlighted.textContent; dropdown.classList.remove('show'); } 
+                else { dropdown.classList.remove('show'); }
             }
         });
 
@@ -1121,71 +1174,85 @@
         });
     }
 
-    function closeAllPopups() {
-        if (calendarPopup) calendarPopup.classList.remove('show');
-        if (dateDisplayBox) dateDisplayBox.classList.remove('active');
-        const startDropdown = document.getElementById('startTimeDropdown');
-        const endDropdown = document.getElementById('endTimeDropdown');
-        if (startDropdown) startDropdown.classList.remove('show');
-        if (endDropdown) endDropdown.classList.remove('show');
-        const startGroup = document.getElementById('startTimeGroup');
-        const endGroup = document.getElementById('endTimeGroup');
-        if (startGroup) startGroup.classList.remove('active');
-        if (endGroup) endGroup.classList.remove('active');
+    function populateDropdown(dropdown, options, input) {
+        dropdown.innerHTML = '';
+        options.forEach(time => {
+            const div = document.createElement('div');
+            div.className = 'time-option';
+            div.textContent = time;
+            if (time === input.value) div.classList.add('highlighted');
+            div.addEventListener('mouseover', function() {
+                dropdown.querySelectorAll('.time-option').forEach(el => el.classList.remove('highlighted'));
+                this.classList.add('highlighted');
+            });
+            dropdown.appendChild(div);
+        });
     }
 
-    window.addEventListener('click', closeAllPopups);
-
-    const calendarEl = calendarPopup;
-    if (calendarEl) {
-        calendarEl.addEventListener('click', (e) => e.stopPropagation());
+    function filterDropdown(query, dropdown) {
+        const options = dropdown.querySelectorAll('.time-option');
+        const lowerQuery = query.toLowerCase();
+        let firstVisible = null;
+        options.forEach(opt => {
+            const text = opt.textContent.toLowerCase();
+            if (text.includes(lowerQuery)) {
+                opt.style.display = 'block';
+                if (!firstVisible) firstVisible = opt;
+            } else { opt.style.display = 'none'; }
+            opt.classList.remove('highlighted');
+        });
+        if (firstVisible) { firstVisible.classList.add('highlighted'); firstVisible.scrollIntoView({ block: 'nearest' }); }
     }
-
-    const startDropdownEl = document.getElementById('startTimeDropdown');
-    const endDropdownEl = document.getElementById('endTimeDropdown');
-    if (startDropdownEl) startDropdownEl.addEventListener('click', (e) => e.stopPropagation());
-    if (endDropdownEl) endDropdownEl.addEventListener('click', (e) => e.stopPropagation());
 
     setupTimePicker('startTimeInput', 'startTimeDropdown');
     setupTimePicker('endTimeInput', 'endTimeDropdown');
 
     // ========================
-    // ADD TASK (SAVE TO DB)
+    // GLOBAL POPUP HANDLING
     // ========================
+    window.addEventListener('click', closeAllPopups);
+    calendarPopup.addEventListener('click', (e) => e.stopPropagation());
+    document.getElementById('startTimeDropdown').addEventListener('click', (e) => e.stopPropagation());
+    document.getElementById('endTimeDropdown').addEventListener('click', (e) => e.stopPropagation());
+
+    function closeAllPopups() {
+        calendarPopup.classList.remove('show');
+        dateDisplayBox.classList.remove('active');
+        document.getElementById('startTimeDropdown').classList.remove('show');
+        document.getElementById('endTimeDropdown').classList.remove('show');
+        document.getElementById('startTimeGroup').classList.remove('active');
+        document.getElementById('endTimeGroup').classList.remove('active');
+    }
+
     function addTask() {
         const form = document.getElementById('taskForm');
-        if (!form) return;
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return;
-        }
+        if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
 
-        const noTime = document.getElementById('noSpecificTime');
-        const isNoTime = noTime ? noTime.checked : false;
+        const isNoTime = document.getElementById('noSpecificTime').checked;
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const day = String(selectedDate.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-        const startTime = document.getElementById('startTimeInput')?.value || '';
-        const endTime = document.getElementById('endTimeInput')?.value || '';
+        const startTime = document.getElementById('startTimeInput').value;
+        const endTime = document.getElementById('endTimeInput').value;
         const formattedTime = isNoTime ? null : `${startTime} – ${endTime}`;
 
         const kategoriInput = document.querySelector('input[name="taskCategory"]:checked');
         const kategoriId = kategoriInput ? kategoriInput.value : null;
 
         const payload = {
-            judul_tugas: document.getElementById('taskTitle')?.value || '',
+            judul_tugas: document.getElementById('taskTitle').value,
             kategori_id: kategoriId,
             tanggal: formattedDate,
             waktu: formattedTime,
-            catatan: document.getElementById('taskNotes')?.value || ''
+            catatan: document.getElementById('taskNotes').value
         };
 
         const modalEl = document.getElementById('addTaskModal');
-        const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl) : null;
+        const modal = bootstrap.Modal.getInstance(modalEl);
 
         const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : ''; 
 
         fetch("{{ route('rencana.store') }}", {
             method: 'POST',
@@ -1201,28 +1268,26 @@
             }
             return response.json();
         }).then(() => {
-            if (modal) modal.hide();
+            // Reset UI setelah berhasil
+            modal.hide();
             form.reset();
             form.classList.remove('was-validated');
-            const charCount = document.getElementById('charCount');
-            if (charCount) charCount.textContent = '0';
-            selectedDate = new Date();
-            currentDate = new Date();
+            document.getElementById('charCount').textContent = '0';
+            selectedDate = new Date(); currentDate = new Date();
             updateDateDisplay();
-            const startInput = document.getElementById('startTimeInput');
-            const endInput = document.getElementById('endTimeInput');
-            const datetimeSection = document.getElementById('datetimeSection');
-            if (startInput) { startInput.value = '7:30pm'; startInput.disabled = false; }
-            if (endInput) { endInput.value = '8:30pm'; endInput.disabled = false; }
-            if (datetimeSection) datetimeSection.classList.remove('disabled');
+            document.getElementById('startTimeInput').value = "7:30pm";
+            document.getElementById('endTimeInput').value = "8:30pm";
+            document.getElementById('datetimeSection').classList.remove('disabled');
+            document.getElementById('startTimeInput').disabled = false;
+            document.getElementById('endTimeInput').disabled = false;
 
-            const toastEl = document.getElementById('successToast');
-            if (toastEl) {
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            }
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            toast.show();
 
-            setTimeout(() => { window.location.reload(); }, 600);
+            // Setelah tersimpan di database, reload halaman agar daftar tugas & statistik sesuai data terbaru
+            setTimeout(() => {
+                window.location.reload();
+            }, 600);
         }).catch(() => {
             alert('Gagal menyimpan rencana. Silakan coba lagi.');
         });
@@ -1232,48 +1297,25 @@
     // INITIALIZATION
     // ========================
     document.addEventListener('DOMContentLoaded', function() {
-        // Attach event listener ke semua checkbox tugas
-        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const taskItem = this.closest('.task-item');
-                if (!taskItem) return;
-                const taskId = taskItem.getAttribute('data-task-id');
-                const isCompleted = this.checked;
+        // Initialize semua komponen
+        initializeTaskCheckboxes();
+        updateDateDisplay();
+        loadCategoryOptionsFromStorage();
 
-                if (isCompleted) {
-                    // Animasi kecil lalu pindah ke section Terselesaikan
-                    taskItem.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                    taskItem.style.opacity = '0.5';
-                    taskItem.style.transform = 'translateX(-10px)';
-
-                    setTimeout(() => {
-                        moveTaskToCompleted(taskItem, taskId);
-                        updateTaskCounters();
-                    }, 300);
-                } else {
-                    const titleEl = taskItem.querySelector('.task-title');
-                    if (titleEl) titleEl.classList.remove('task-completed');
-                    moveTaskToActive(taskItem, taskId);
-                    updateTaskCounters();
-                }
-
-                // Sinkronkan status ke server
-                syncTaskStatusToServer(taskId, isCompleted);
-            });
-        });
-
-        // Set initial state untuk task yang sudah checked (status = selesai)
+        // Set initial state untuk task yang sudah checked (pindahkan dulu ke section Terselesaikan)
         document.querySelectorAll('.task-checkbox:checked').forEach(checkbox => {
             const taskItem = checkbox.closest('.task-item');
-            if (!taskItem) return;
             const taskId = taskItem.getAttribute('data-task-id');
             moveTaskToCompleted(taskItem, taskId);
         });
 
+        // Setelah posisi task benar, baru hitung ulang counter dan statistik
         updateCompletedSectionVisibility();
         updateTaskCounters();
-
-        updateDateDisplay();
-        loadCategoryOptionsFromStorage();
+        
+        // Modal focus
+        const modal = document.getElementById('addTaskModal');
+        modal.addEventListener('shown.bs.modal', function() { document.getElementById('taskTitle').focus(); });
     });
 </script>
+@endpush

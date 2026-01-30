@@ -66,18 +66,29 @@
                     </h5>
                     
                     <div class="category-legend">
-                        <div class="legend-item">
-                            <span class="legend-dot task-dot-work"></span>
-                            <span class="legend-label">Kerja</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-dot task-dot-learning"></span>
-                            <span class="legend-label">Belajar</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-dot task-dot-personal"></span>
-                            <span class="legend-label">Pribadi</span>
-                        </div>
+                        @forelse($categories as $cat)
+                            @php
+                                $warna = trim($cat->warna ?? '');
+                                $warnaLower = strtolower($warna);
+                                $colorMap = [
+                                    'biru' => '#2563eb',
+                                    'blue' => '#2563eb',
+                                    'hijau' => '#10b981',
+                                    'green' => '#10b981',
+                                    'kuning' => '#f59e0b',
+                                    'yellow' => '#f59e0b',
+                                    'merah' => '#ef4444',
+                                    'red' => '#ef4444',
+                                ];
+                                $cssColor = $colorMap[$warnaLower] ?? ($warna ?: '#2563eb');
+                            @endphp
+                            <div class="legend-item">
+                                <span class="legend-dot" style="background-color: {{ $cssColor }};"></span>
+                                <span class="legend-label">{{ $cat->nama_kategori }}</span>
+                            </div>
+                        @empty
+                            <div class="text-muted small">Belum ada kategori. Tambah kategori di halaman Kategori.</div>
+                        @endforelse
                     </div>
                 </div>
             </div>
@@ -93,21 +104,21 @@
                     <div class="stat-item mb-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Total Tugas</span>
-                            <span class="fw-bold text-dark" id="statTotal">0</span>
+                            <span class="fw-bold text-dark" id="statTotal">{{ $totalTasks }}</span>
                         </div>
                     </div>
                     
                     <div class="stat-item mb-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Selesai</span>
-                            <span class="fw-bold text-success">18</span>
+                            <span class="fw-bold text-success" id="statCompleted">{{ $completedTasks }}</span>
                         </div>
                     </div>
                     
                     <div class="stat-item">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Tertunda</span>
-                            <span class="fw-bold text-warning">6</span>
+                            <span class="fw-bold text-warning" id="statOverdue">{{ $overdueTasks }}</span>
                         </div>
                     </div>
                 </div>
@@ -738,9 +749,91 @@
     .is-editing-mode #submitTaskBtn { background-color: #f59e0b !important; border-color: #f59e0b !important; }
     .is-editing-mode #submitTaskBtn:hover { background-color: #d97706 !important; }
 
+    /* ============================================
+       MOBILE RESPONSIVE FOR CALENDAR
+       ============================================ */
+    @media (max-width: 992px) {
+        /* Stack sidebar on tablet */
+        .col-lg-9, .col-lg-3 {
+            margin-bottom: 1rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        /* Smaller calendar cells */
+        .calendar-day {
+            padding: 0.25rem;
+            font-size: 0.8rem;
+        }
+        
+        .day-number {
+            font-size: 0.75rem;
+        }
+        
+        .task-dot {
+            width: 4px;
+            height: 4px;
+        }
+        
+        .calendar-day-header {
+            font-size: 0.75rem;
+            padding: 0.5rem 0;
+        }
+        
+        /* Month navigation */
+        #monthLabel {
+            font-size: 1.125rem;
+        }
+    }
+    
     @media (max-width: 576px) {
         .datetime-wrapper { flex-direction: column; }
         .date-section, .time-section { width: 100%; flex: auto; }
+        
+        /* Even smaller calendar for mobile */
+        .calendar-grid {
+            gap: 4px;
+        }
+        
+        .calendar-day {
+            padding: 0.2rem;
+            border-radius: 6px;
+        }
+        
+        .day-number {
+            font-size: 0.7rem;
+            margin-bottom: 0.125rem;
+        }
+        
+        .task-indicators {
+            gap: 2px;
+        }
+        
+        .task-dot {
+            width: 3px;
+            height: 3px;
+        }
+        
+        /* Legend more compact */
+        .legend-item {
+            font-size: 0.8rem;
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+        }
+        
+        /* Header actions stack */
+        .row.mb-4 .d-flex {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+        
+        .row.mb-4 .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
     }
 </style>
 @endpush
@@ -756,21 +849,48 @@
     let editTargetDate = null;
     let editTargetIndex = null;
 
-    const tasksData = {
-        '2026-01-03': [
-            { title: 'Review Code', category: 'work', time: '09:00', notes: 'Check PR #123' },
-            { title: 'Gym', category: 'personal', time: '17:00', notes: 'Leg day' }
-        ],
-        '2026-01-05': [
-            { title: 'Laravel Tutorial', category: 'learning', time: '14:00', notes: '' }
-        ]
-    };
+    // Data rencana asli dari backend (tabel rencana + kategori)
+    const backendPlans = @json($plans);
 
-    const categoryLabels = {
-        'work': 'Kerja',
-        'learning': 'Belajar',
-        'personal': 'Pribadi'
-    };
+    // Mapping warna kategori ke warna hex yang dipakai di kalender
+    function resolveCategoryColor(rawColor) {
+        // Jika tidak ada warna/kategori, pakai abu-abu sebagai default
+        if (!rawColor) return '#9ca3af'; // gray-400
+
+        const lower = String(rawColor).trim().toLowerCase();
+        const map = {
+            'biru': '#2563eb',
+            'blue': '#2563eb',
+            'hijau': '#10b981',
+            'green': '#10b981',
+            'kuning': '#f59e0b',
+            'yellow': '#f59e0b',
+            'merah': '#ef4444',
+            'red': '#ef4444',
+        };
+        // Kalau warna dikenali di map → pakai itu, kalau tidak → pakai nilai aslinya
+        // (fallback terakhir tetap abu-abu kalau entah kenapa masih falsy)
+        return map[lower] || rawColor || '#9ca3af';
+    }
+
+    const rawPlans = (backendPlans || []).map(p => ({
+        id: p.id,
+        title: p.judul_tugas,
+        date: p.tanggal,
+        time: p.waktu,
+        notes: p.catatan,
+        status: p.status,
+        category_name: p.nama_kategori,
+        color: resolveCategoryColor(p.warna),
+    }));
+
+    // Group per tanggal supaya lebih mudah dipakai kalender & modal
+    const tasksData = {};
+    (rawPlans || []).forEach(plan => {
+        if (!plan.date) return;
+        if (!tasksData[plan.date]) tasksData[plan.date] = [];
+        tasksData[plan.date].push(plan);
+    });
 
     const monthNames = [
         "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -847,10 +967,12 @@
 
             let indicatorsHtml = '';
             const tasks = tasksData[dateString];
-            if (tasks) {
+            if (tasks && tasks.length > 0) {
                 indicatorsHtml += `<div class="task-indicators">`;
                 tasks.forEach(task => {
-                    indicatorsHtml += `<span class="task-dot task-dot-${task.category}"></span>`;
+                    // Default abu-abu kalau tidak ada kategori/warna
+                    const color = task.color || '#9ca3af';
+                    indicatorsHtml += `<span class="task-dot" style="background-color: ${color};"></span>`;
                 });
                 indicatorsHtml += `</div>`;
             }
@@ -885,18 +1007,25 @@
             `;
         } else {
             tasks.forEach((task, index) => {
-                // Tambahkan onclick untuk membuka modal edit
+                // Default abu-abu kalau tidak ada kategori/warna
+                const color = task.color || '#9ca3af';
+                const categoryName = task.category_name || 'Kategori';
+                const timeText = task.time || 'All Day';
+
                 tasksHtml += `
-                    <div class="task-item-modal task-${task.category}" onclick="bukaModalEdit('${date}', ${index})">
+                    <div class="task-item-modal" style="border-left-color: ${color};" onclick="bukaModalEdit('${date}', ${index})">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="mb-1 fw-semibold">${task.title}</h6>
-                                <span class="badge rounded-pill category-badge text-bg-${getCategoryBadgeColor(task.category)}">${categoryLabels[task.category] || task.category}</span>
+                                <span class="badge rounded-pill category-badge" style="background-color: ${color}1A; color: ${color}; border: 1px solid ${color}33;">
+                                    ${categoryName}
+                                </span>
                             </div>
                             <small class="text-muted">
-                                <i class="bi bi-clock me-1"></i>${task.time || 'All Day'}
+                                <i class="bi bi-clock me-1"></i>${timeText}
                             </small>
                         </div>
+                        ${task.notes ? `<p class="text-muted small mb-0 mt-2">${task.notes}</p>` : ''}
                     </div>
                 `;
             });
@@ -906,13 +1035,6 @@
         
         const modal = new bootstrap.Modal(document.getElementById('taskDetailModal'));
         modal.show();
-    }
-
-    function getCategoryBadgeColor(cat) {
-        if(cat === 'work') return 'primary';
-        if(cat === 'learning') return 'success';
-        if(cat === 'personal') return 'warning';
-        return 'secondary';
     }
 
     // ============================
@@ -967,7 +1089,7 @@
         
         const radios = document.getElementsByName('taskCategory');
         for(let r of radios) {
-            if(r.value === task.category) r.checked = true;
+            if(r.value === task.category_name) r.checked = true;
         }
 
         const [y, m, d] = dateString.split('-').map(Number);
@@ -1049,12 +1171,22 @@
         const endTime = document.getElementById('endTimeInput').value;
         const formattedTime = isNoTime ? null : `${startTime} – ${endTime}`;
 
+        // Untuk data yang dibuat dari halaman ini (belum tersimpan ke DB),
+        // kita tetap masukkan ke tasksData agar muncul di tampilan kalender.
+        const selectedCategoryInput = document.querySelector('input[name="taskCategory"]:checked');
+        const selectedCategoryLabel = selectedCategoryInput
+            ? (document.querySelector(`label[for="${selectedCategoryInput.id}"]`)?.innerText.trim() || 'Kategori')
+            : 'Kategori';
+
         const taskData = {
+            id: null,
             title: document.getElementById('taskTitle').value,
-            category: document.querySelector('input[name="taskCategory"]:checked')?.value || 'personal',
-            date: newFormattedDate, 
+            date: newFormattedDate,
             time: formattedTime || '',
-            notes: document.getElementById('taskNotes').value
+            notes: document.getElementById('taskNotes').value,
+            status: null,
+            category_name: selectedCategoryLabel,
+            color: '#10b981',
         };
 
         if (isEditing) {
