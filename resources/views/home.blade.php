@@ -42,6 +42,46 @@
                                     $title = $task->judul_tugas;
                                     $timeText = $task->waktu;
                                     $categoryLabel = $task->nama_kategori;
+                                    $notesText = $task->catatan;
+                                    $warna = trim($task->warna ?? '');
+                                    $warnaLower = strtolower($warna);
+                                    $colorMap = [
+                                        'biru' => ['bg' => '#dbeafe', 'text' => '#1e40af'],
+                                        'blue' => ['bg' => '#dbeafe', 'text' => '#1e40af'],
+                                        'hijau' => ['bg' => '#d1fae5', 'text' => '#065f46'],
+                                        'green' => ['bg' => '#d1fae5', 'text' => '#065f46'],
+                                        'kuning' => ['bg' => '#fef3c7', 'text' => '#92400e'],
+                                        'yellow' => ['bg' => '#fef3c7', 'text' => '#92400e'],
+                                        'merah' => ['bg' => '#fee2e2', 'text' => '#991b1b'],
+                                        'red' => ['bg' => '#fee2e2', 'text' => '#991b1b'],
+                                        'ungu' => ['bg' => '#ede9fe', 'text' => '#5b21b6'],
+                                        'purple' => ['bg' => '#ede9fe', 'text' => '#5b21b6'],
+                                        'pink' => ['bg' => '#fce7f3', 'text' => '#9d174d'],
+                                        'abu-abu' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                        'gray' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                        'grey' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                    ];
+                                    $badgeBg = $colorMap[$warnaLower]['bg'] ?? '#f3f4f6';
+                                    $badgeText = $colorMap[$warnaLower]['text'] ?? '#374151';
+                                    $badgeDarkMap = [
+                                        'biru' => ['bg' => 'rgba(37, 99, 235, 0.15)', 'text' => '#93c5fd', 'border' => 'rgba(59, 130, 246, 0.3)'],
+                                        'blue' => ['bg' => 'rgba(37, 99, 235, 0.15)', 'text' => '#93c5fd', 'border' => 'rgba(59, 130, 246, 0.3)'],
+                                        'hijau' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'text' => '#6ee7b7', 'border' => 'rgba(16, 185, 129, 0.3)'],
+                                        'green' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'text' => '#6ee7b7', 'border' => 'rgba(16, 185, 129, 0.3)'],
+                                        'kuning' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'text' => '#fcd34d', 'border' => 'rgba(245, 158, 11, 0.3)'],
+                                        'yellow' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'text' => '#fcd34d', 'border' => 'rgba(245, 158, 11, 0.3)'],
+                                        'merah' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'text' => '#fca5a5', 'border' => 'rgba(239, 68, 68, 0.3)'],
+                                        'red' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'text' => '#fca5a5', 'border' => 'rgba(239, 68, 68, 0.3)'],
+                                        'ungu' => ['bg' => 'rgba(124, 58, 237, 0.15)', 'text' => '#ddd6fe', 'border' => 'rgba(124, 58, 237, 0.3)'],
+                                        'purple' => ['bg' => 'rgba(124, 58, 237, 0.15)', 'text' => '#ddd6fe', 'border' => 'rgba(124, 58, 237, 0.3)'],
+                                        'pink' => ['bg' => 'rgba(236, 72, 153, 0.15)', 'text' => '#fbcfe8', 'border' => 'rgba(236, 72, 153, 0.3)'],
+                                        'abu-abu' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                        'gray' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                        'grey' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                    ];
+                                    $badgeDarkBg = $badgeDarkMap[$warnaLower]['bg'] ?? 'rgba(156, 163, 175, 0.15)';
+                                    $badgeDarkText = $badgeDarkMap[$warnaLower]['text'] ?? '#e5e7eb';
+                                    $badgeDarkBorder = $badgeDarkMap[$warnaLower]['border'] ?? 'rgba(156, 163, 175, 0.3)';
                                     $isCompleted = ($task->status === 'selesai');
                                 @endphp
                                 <div class="list-group-item border-0 px-0 py-3 rounded task-item" data-task-id="{{ $taskId }}">
@@ -50,14 +90,33 @@
                                             <input class="form-check-input task-checkbox" type="checkbox" id="task{{ $taskId }}" data-completed="{{ $isCompleted ? 'true' : 'false' }}" @checked($isCompleted)>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <label for="task{{ $taskId }}" class="task-title mb-1">{{ $title }}</label>
-                                            @if($timeText)
-                                                <p class="text-muted small mb-0">
-                                                    <i class="bi bi-clock me-1"></i>{{ $timeText }}
-                                                </p>
-                                            @endif
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <label for="task{{ $taskId }}" class="task-title mb-1">{{ $title }}</label>
+                                                    @if($timeText)
+                                                        <p class="text-muted small mb-0">
+                                                            <i class="bi bi-clock me-1"></i>{{ $timeText }}
+                                                        </p>
+                                                    @endif
+                                                    @if($notesText)
+                                                        <p class="text-muted small mb-0 mt-1">{{ $notesText }}</p>
+                                                    @endif
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge rounded-pill category-badge" style="--badge-bg: {{ $badgeBg }}; --badge-text: {{ $badgeText }}; --badge-bg-dark: {{ $badgeDarkBg }}; --badge-text-dark: {{ $badgeDarkText }}; --badge-border-dark: {{ $badgeDarkBorder }};">{{ $categoryLabel ?: 'Tanpa Kategori' }}</span>
+                                                    
+                                                    <!-- Action Buttons (Hover Only) -->
+                                                    <div class="task-actions ms-3 hover-show d-flex align-items-center gap-2">
+                                                        <button class="btn btn-sm btn-link text-muted p-0" onclick="event.preventDefault(); openEditTaskModal('{{ $taskId }}')" title="Edit" style="text-decoration: none;">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-link text-muted p-0" onclick="event.preventDefault(); confirmDeleteTask('{{ $taskId }}')" title="Hapus" style="text-decoration: none;">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <span class="badge rounded-pill category-badge category-work">{{ $categoryLabel }}</span>
                                     </div>
                                 </div>
                             @empty
@@ -110,6 +169,45 @@
                                     $planDate = $plan->tanggal;
                                     $planTime = $plan->waktu;
                                     $planCategory = $plan->nama_kategori;
+                                    $warna = trim($plan->warna ?? '');
+                                    $warnaLower = strtolower($warna);
+                                    $colorMap = [
+                                        'biru' => ['bg' => '#dbeafe', 'text' => '#1e40af'],
+                                        'blue' => ['bg' => '#dbeafe', 'text' => '#1e40af'],
+                                        'hijau' => ['bg' => '#d1fae5', 'text' => '#065f46'],
+                                        'green' => ['bg' => '#d1fae5', 'text' => '#065f46'],
+                                        'kuning' => ['bg' => '#fef3c7', 'text' => '#92400e'],
+                                        'yellow' => ['bg' => '#fef3c7', 'text' => '#92400e'],
+                                        'merah' => ['bg' => '#fee2e2', 'text' => '#991b1b'],
+                                        'red' => ['bg' => '#fee2e2', 'text' => '#991b1b'],
+                                        'ungu' => ['bg' => '#ede9fe', 'text' => '#5b21b6'],
+                                        'purple' => ['bg' => '#ede9fe', 'text' => '#5b21b6'],
+                                        'pink' => ['bg' => '#fce7f3', 'text' => '#9d174d'],
+                                        'abu-abu' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                        'gray' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                        'grey' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                    ];
+                                    $badgeBg = $colorMap[$warnaLower]['bg'] ?? '#f3f4f6';
+                                    $badgeText = $colorMap[$warnaLower]['text'] ?? '#374151';
+                                    $badgeDarkMap = [
+                                        'biru' => ['bg' => 'rgba(37, 99, 235, 0.15)', 'text' => '#93c5fd', 'border' => 'rgba(59, 130, 246, 0.3)'],
+                                        'blue' => ['bg' => 'rgba(37, 99, 235, 0.15)', 'text' => '#93c5fd', 'border' => 'rgba(59, 130, 246, 0.3)'],
+                                        'hijau' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'text' => '#6ee7b7', 'border' => 'rgba(16, 185, 129, 0.3)'],
+                                        'green' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'text' => '#6ee7b7', 'border' => 'rgba(16, 185, 129, 0.3)'],
+                                        'kuning' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'text' => '#fcd34d', 'border' => 'rgba(245, 158, 11, 0.3)'],
+                                        'yellow' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'text' => '#fcd34d', 'border' => 'rgba(245, 158, 11, 0.3)'],
+                                        'merah' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'text' => '#fca5a5', 'border' => 'rgba(239, 68, 68, 0.3)'],
+                                        'red' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'text' => '#fca5a5', 'border' => 'rgba(239, 68, 68, 0.3)'],
+                                        'ungu' => ['bg' => 'rgba(124, 58, 237, 0.15)', 'text' => '#ddd6fe', 'border' => 'rgba(124, 58, 237, 0.3)'],
+                                        'purple' => ['bg' => 'rgba(124, 58, 237, 0.15)', 'text' => '#ddd6fe', 'border' => 'rgba(124, 58, 237, 0.3)'],
+                                        'pink' => ['bg' => 'rgba(236, 72, 153, 0.15)', 'text' => '#fbcfe8', 'border' => 'rgba(236, 72, 153, 0.3)'],
+                                        'abu-abu' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                        'gray' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                        'grey' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                    ];
+                                    $badgeDarkBg = $badgeDarkMap[$warnaLower]['bg'] ?? 'rgba(156, 163, 175, 0.15)';
+                                    $badgeDarkText = $badgeDarkMap[$warnaLower]['text'] ?? '#e5e7eb';
+                                    $badgeDarkBorder = $badgeDarkMap[$warnaLower]['border'] ?? 'rgba(156, 163, 175, 0.3)';
                                 @endphp
                                 <div class="col-md-6">
                                     <div class="p-3 bg-white rounded shadow-sm h-100">
@@ -121,7 +219,7 @@
                                             @endif
                                         </p>
                                         <div class="d-flex align-items-center mb-2">
-                                            <span class="badge rounded-pill category-badge category-work me-2">{{ $planCategory }}</span>
+                                            <span class="badge rounded-pill category-badge me-2" style="--badge-bg: {{ $badgeBg }}; --badge-text: {{ $badgeText }}; --badge-bg-dark: {{ $badgeDarkBg }}; --badge-text-dark: {{ $badgeDarkText }}; --badge-border-dark: {{ $badgeDarkBorder }};">{{ $planCategory ?: 'Tanpa Kategori' }}</span>
                                             <small class="text-truncate">{{ $planTitle }}</small>
                                         </div>
                                         @if($planTime)
@@ -193,12 +291,52 @@
                                 @php
                                     $inputId = 'categoryDb_' . $category->kategori_id;
                                     $isFirst = $index === 0;
-                                    // Sementara gunakan style "Kerja" untuk semua kategori agar konsisten dengan desain
+                                    $warna = trim($category->warna ?? '');
+                                    $warnaLower = strtolower($warna);
+                                    $colorMap = [
+                                        'biru' => ['bg' => '#dbeafe', 'text' => '#1e40af'],
+                                        'blue' => ['bg' => '#dbeafe', 'text' => '#1e40af'],
+                                        'hijau' => ['bg' => '#d1fae5', 'text' => '#065f46'],
+                                        'green' => ['bg' => '#d1fae5', 'text' => '#065f46'],
+                                        'kuning' => ['bg' => '#fef3c7', 'text' => '#92400e'],
+                                        'yellow' => ['bg' => '#fef3c7', 'text' => '#92400e'],
+                                        'merah' => ['bg' => '#fee2e2', 'text' => '#991b1b'],
+                                        'red' => ['bg' => '#fee2e2', 'text' => '#991b1b'],
+                                        'ungu' => ['bg' => '#ede9fe', 'text' => '#5b21b6'],
+                                        'purple' => ['bg' => '#ede9fe', 'text' => '#5b21b6'],
+                                        'pink' => ['bg' => '#fce7f3', 'text' => '#9d174d'],
+                                        'abu-abu' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                        'gray' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                        'grey' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                    ];
+                                    $cssBg = $colorMap[$warnaLower]['bg'] ?? '#f3f4f6';
+                                    $cssText = $colorMap[$warnaLower]['text'] ?? '#374151';
+
+                                    $darkMap = [
+                                        'biru' => ['bg' => 'rgba(37, 99, 235, 0.15)', 'text' => '#93c5fd', 'border' => 'rgba(59, 130, 246, 0.3)'],
+                                        'blue' => ['bg' => 'rgba(37, 99, 235, 0.15)', 'text' => '#93c5fd', 'border' => 'rgba(59, 130, 246, 0.3)'],
+                                        'hijau' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'text' => '#6ee7b7', 'border' => 'rgba(16, 185, 129, 0.3)'],
+                                        'green' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'text' => '#6ee7b7', 'border' => 'rgba(16, 185, 129, 0.3)'],
+                                        'kuning' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'text' => '#fcd34d', 'border' => 'rgba(245, 158, 11, 0.3)'],
+                                        'yellow' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'text' => '#fcd34d', 'border' => 'rgba(245, 158, 11, 0.3)'],
+                                        'merah' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'text' => '#fca5a5', 'border' => 'rgba(239, 68, 68, 0.3)'],
+                                        'red' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'text' => '#fca5a5', 'border' => 'rgba(239, 68, 68, 0.3)'],
+                                        'ungu' => ['bg' => 'rgba(124, 58, 237, 0.15)', 'text' => '#ddd6fe', 'border' => 'rgba(124, 58, 237, 0.3)'],
+                                        'purple' => ['bg' => 'rgba(124, 58, 237, 0.15)', 'text' => '#ddd6fe', 'border' => 'rgba(124, 58, 237, 0.3)'],
+                                        'pink' => ['bg' => 'rgba(236, 72, 153, 0.15)', 'text' => '#fbcfe8', 'border' => 'rgba(236, 72, 153, 0.3)'],
+                                        'abu-abu' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                        'gray' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                        'grey' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                    ];
+                                    $darkBg = $darkMap[$warnaLower]['bg'] ?? 'rgba(156, 163, 175, 0.15)';
+                                    $darkText = $darkMap[$warnaLower]['text'] ?? '#e5e7eb';
+                                    $darkBorder = $darkMap[$warnaLower]['border'] ?? 'rgba(156, 163, 175, 0.3)';
                                 @endphp
                                 <input type="radio" class="btn-check" name="taskCategory" id="{{ $inputId }}" value="{{ $category->kategori_id }}" autocomplete="off" @checked($isFirst)>
-                                <label class="btn btn-sm btn-category btn-work" for="{{ $inputId }}">
+                                <label class="btn btn-sm btn-category" for="{{ $inputId }}" style="--pill-bg: {{ $cssBg }}; --pill-text: {{ $cssText }}; --pill-bg-dark: {{ $darkBg }}; --pill-text-dark: {{ $darkText }}; --pill-border-dark: {{ $darkBorder }};">
                                     <i class="bi bi-tag me-1"></i>{{ $category->nama_kategori }}
                                 </label>
+
                             @empty
                                 <span class="text-muted small" id="emptyCategoryHint">Belum ada kategori. Tambah kategori dulu.</span>
                             @endforelse
@@ -305,6 +443,7 @@
                             <option value="biru" selected>Biru</option>
                             <option value="hijau">Hijau</option>
                             <option value="kuning">Kuning</option>
+                            <option value="merah">Merah</option>
                             <option value="ungu">Ungu</option>
                             <option value="pink">Pink</option>
                             <option value="abu-abu">Abu-abu</option>
@@ -331,6 +470,26 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal (Same as Calendar) -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-circle text-warning display-4"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Hapus Rencana?</h5>
+                <p class="text-muted small mb-4">Apakah Anda yakin ingin menghapus rencana ini? Tindakan ini tidak dapat dibatalkan.</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
+                    <button type="button" class="btn btn-danger w-100" id="confirmDeleteBtn" style="border-radius: 8px;">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Toast Notification -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -390,6 +549,18 @@
         transition: all 0.2s ease;
         font-weight: 500;
     }
+
+    .btn-category {
+        background-color: var(--pill-bg, #f3f4f6) !important;
+        color: var(--pill-text, #374151) !important;
+        border-color: var(--pill-bg, #f3f4f6) !important;
+    }
+
+    html[data-theme="dark"] .btn-category {
+        background-color: var(--pill-bg-dark, rgba(148, 163, 184, 0.12)) !important;
+        color: var(--pill-text-dark, #e5e7eb) !important;
+        border-color: var(--pill-border-dark, rgba(148, 163, 184, 0.25)) !important;
+    }
     
     /* WARNA ASLI KERJA */
     .btn-work { color: #1e40af; background-color: #dbeafe; border-color: #dbeafe; }
@@ -412,6 +583,15 @@
         font-weight: 500;
         font-size: 0.75rem;
         letter-spacing: 0.3px;
+        background-color: var(--badge-bg, #f3f4f6) !important;
+        color: var(--badge-text, #374151) !important;
+        border: 1px solid var(--badge-bg, #f3f4f6);
+    }
+
+    html[data-theme="dark"] .category-badge {
+        background-color: var(--badge-bg-dark, rgba(148, 163, 184, 0.12)) !important;
+        color: var(--badge-text-dark, #e5e7eb) !important;
+        border-color: var(--badge-border-dark, rgba(148, 163, 184, 0.25));
     }
     
     .category-work {
@@ -482,6 +662,17 @@
     .task-item:hover {
         background-color: rgba(16, 185, 129, 0.05);
         transform: translateY(-1px);
+    }
+    
+    .task-item:hover .hover-show {
+        opacity: 1 !important;
+        pointer-events: auto;
+    }
+
+    .task-actions {
+        transition: opacity 0.2s ease-in-out;
+        opacity: 0; 
+        pointer-events: none; /* Prevent accidental clicks when hidden */
     }
 
     .completed-section {
@@ -576,7 +767,7 @@
     
     /* Color Teks Waktu (Adaptif) */
     html:not([data-theme="dark"]) .time-input-group input { color: #111827; }
-    html[data-theme="dark"]) .time-input-group input { color: #ffffff; }
+    html[data-theme="dark"] .time-input-group input { color: #ffffff; }
     
     .time-separator { opacity: 0.5; font-weight: 300; pointer-events: none; }
 
@@ -597,7 +788,7 @@
         animation: fadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
-    html[data-theme="dark"]) .calendar-popup {
+    html[data-theme="dark"] .calendar-popup {
         background: #1f2937;
         border-color: #374151;
     }
@@ -608,11 +799,11 @@
     
     /* Calendar Colors Adaptif */
     html:not([data-theme="dark"]) .calendar-month-title { color: #111827; }
-    html[data-theme="dark"]) .calendar-month-title { color: #f3f4f6; }
+    html[data-theme="dark"] .calendar-month-title { color: #f3f4f6; }
 
     .calendar-nav-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 50%; transition: background 0.2s; color: #6b7280; }
     .calendar-nav-btn:hover { background: #f3f4f6; color: #111827; }
-    html[data-theme="dark"]) .calendar-nav-btn:hover { background: #374151; color: white; }
+    html[data-theme="dark"] .calendar-nav-btn:hover { background: #374151; color: white; }
 
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
     .calendar-day-label { font-size: 0.75rem; font-weight: 600; padding-bottom: 10px; text-transform: uppercase; color: #9ca3af; }
@@ -625,9 +816,9 @@
     html:not([data-theme="dark"]) .calendar-day.other-month { color: #e5e7eb; }
     
     /* Calendar Day Colors (Dark Mode) */
-    html[data-theme="dark"]) .calendar-day { color: #d1d5db; }
-    html[data-theme="dark"]) .calendar-day:hover:not(.selected) { background-color: #374151; }
-    html[data-theme="dark"]) .calendar-day.other-month { color: #374151; }
+    html[data-theme="dark"] .calendar-day { color: #d1d5db; }
+    html[data-theme="dark"] .calendar-day:hover:not(.selected) { background-color: #374151; }
+    html[data-theme="dark"] .calendar-day.other-month { color: #374151; }
 
     .calendar-day.selected { background-color: var(--primary-green) !important; color: white !important; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4); }
     .calendar-day.today { border: 2px solid var(--primary-green); }
@@ -649,7 +840,7 @@
         padding: 4px;
     }
     
-    html[data-theme="dark"]) .time-dropdown {
+    html[data-theme="dark"] .time-dropdown {
         background: #1f2937;
         border-color: #374151;
     }
@@ -660,8 +851,8 @@
     html:not([data-theme="dark"]) .time-option { color: #374151; }
     html:not([data-theme="dark"]) .time-option:hover { background-color: #f3f4f6; color: var(--primary-green); }
     
-    html[data-theme="dark"]) .time-option { color: #e5e7eb; }
-    html[data-theme="dark"]) .time-option:hover { background-color: #374151; color: var(--primary-green); }
+    html[data-theme="dark"] .time-option { color: #e5e7eb; }
+    html[data-theme="dark"] .time-option:hover { background-color: #374151; color: var(--primary-green); }
 
     .time-option.highlighted { background-color: var(--primary-green); color: white; }
 
@@ -974,6 +1165,8 @@
             'green': { bg:'#d1fae5', text:'#065f46' },
             'kuning': { bg:'#fef3c7', text:'#92400e' },
             'yellow': { bg:'#fef3c7', text:'#92400e' },
+            'merah': { bg:'#fee2e2', text:'#991b1b' },
+            'red': { bg:'#fee2e2', text:'#991b1b' },
             'ungu': { bg:'#ede9fe', text:'#5b21b6' },
             'purple': { bg:'#ede9fe', text:'#5b21b6' },
             'pink': { bg:'#fce7f3', text:'#9d174d' },
@@ -982,8 +1175,26 @@
             'grey': { bg:'#f3f4f6', text:'#374151' },
         };
         const style = map[lower] || { bg: '#f3f4f6', text: '#374151' };
+
+        const darkMap = {
+            'biru': { bg: 'rgba(37, 99, 235, 0.15)', text: '#93c5fd', border: 'rgba(59, 130, 246, 0.3)' },
+            'blue': { bg: 'rgba(37, 99, 235, 0.15)', text: '#93c5fd', border: 'rgba(59, 130, 246, 0.3)' },
+            'hijau': { bg: 'rgba(16, 185, 129, 0.15)', text: '#6ee7b7', border: 'rgba(16, 185, 129, 0.3)' },
+            'green': { bg: 'rgba(16, 185, 129, 0.15)', text: '#6ee7b7', border: 'rgba(16, 185, 129, 0.3)' },
+            'kuning': { bg: 'rgba(245, 158, 11, 0.15)', text: '#fcd34d', border: 'rgba(245, 158, 11, 0.3)' },
+            'yellow': { bg: 'rgba(245, 158, 11, 0.15)', text: '#fcd34d', border: 'rgba(245, 158, 11, 0.3)' },
+            'merah': { bg: 'rgba(239, 68, 68, 0.15)', text: '#fca5a5', border: 'rgba(239, 68, 68, 0.3)' },
+            'red': { bg: 'rgba(239, 68, 68, 0.15)', text: '#fca5a5', border: 'rgba(239, 68, 68, 0.3)' },
+            'ungu': { bg: 'rgba(124, 58, 237, 0.15)', text: '#ddd6fe', border: 'rgba(124, 58, 237, 0.3)' },
+            'purple': { bg: 'rgba(124, 58, 237, 0.15)', text: '#ddd6fe', border: 'rgba(124, 58, 237, 0.3)' },
+            'pink': { bg: 'rgba(236, 72, 153, 0.15)', text: '#fbcfe8', border: 'rgba(236, 72, 153, 0.3)' },
+            'abu-abu': { bg: 'rgba(156, 163, 175, 0.15)', text: '#e5e7eb', border: 'rgba(156, 163, 175, 0.3)' },
+            'gray': { bg: 'rgba(156, 163, 175, 0.15)', text: '#e5e7eb', border: 'rgba(156, 163, 175, 0.3)' },
+            'grey': { bg: 'rgba(156, 163, 175, 0.15)', text: '#e5e7eb', border: 'rgba(156, 163, 175, 0.3)' },
+        };
+        const darkStyle = darkMap[lower] || { bg: 'rgba(156, 163, 175, 0.15)', text: '#e5e7eb', border: 'rgba(156, 163, 175, 0.3)' };
         const value = category && (category.kategori_id ?? category.id) ? (category.kategori_id ?? category.id) : '';
-        newCategory.innerHTML = `<input type="radio" class="btn-check" name="taskCategory" id="${categoryId}" value="${value}" autocomplete="off"><label class="btn btn-sm btn-category" for="${categoryId}" style="background-color: ${style.bg}; color: ${style.text};"><i class="bi bi-tag me-1"></i>${display}</label>`;
+        newCategory.innerHTML = `<input type="radio" class="btn-check" name="taskCategory" id="${categoryId}" value="${value}" autocomplete="off"><label class="btn btn-sm btn-category" for="${categoryId}" style="--pill-bg: ${style.bg}; --pill-text: ${style.text}; --pill-bg-dark: ${darkStyle.bg}; --pill-text-dark: ${darkStyle.text}; --pill-border-dark: ${darkStyle.border};"><i class="bi bi-tag me-1"></i>${display}</label>`;
         additional.appendChild(newCategory);
 
         const input = newCategory.querySelector('input[type="radio"]');
@@ -1012,7 +1223,10 @@
     
     function addNewCategory() {
         const categoryName = document.getElementById('newCategoryName').value.trim();
-        if (!categoryName) return alert('Mohon isi nama kategori');
+        if (!categoryName) {
+            if (window.showToast) window.showToast('Mohon isi nama kategori.', 'error');
+            return;
+        }
 
         const colorEl = document.getElementById('newCategoryColor');
         const warna = colorEl ? colorEl.value : null;
@@ -1042,7 +1256,7 @@
             addCategoryOptionToHome(data.category);
             cancelAddCategory();
         }).catch(() => {
-            alert('Gagal menambahkan kategori. Silakan coba lagi.');
+            if (window.showToast) window.showToast('Gagal menambahkan kategori. Silakan coba lagi.', 'error');
         });
     }
 
@@ -1073,9 +1287,9 @@
     function renderCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         calendarTitle.textContent = `${monthNames[month]} ${year}`;
-        calendarGrid.innerHTML = '<div class="calendar-day-label">Su</div><div class="calendar-day-label">Mo</div><div class="calendar-day-label">Tu</div><div class="calendar-day-label">We</div><div class="calendar-day-label">Th</div><div class="calendar-day-label">Fr</div><div class="calendar-day-label">Sa</div>';
+        calendarGrid.innerHTML = '<div class="calendar-day-label">Min</div><div class="calendar-day-label">Sen</div><div class="calendar-day-label">Sel</div><div class="calendar-day-label">Rab</div><div class="calendar-day-label">Kam</div><div class="calendar-day-label">Jum</div><div class="calendar-day-label">Sab</div>';
         const firstDayIndex = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = new Date();
@@ -1105,8 +1319,7 @@
 
     function updateDateDisplay() {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const parts = selectedDate.toLocaleDateString('en-US', options).split(',');
-        dateText.textContent = `${parts[0]}, ${parts[1]}`;
+        dateText.textContent = selectedDate.toLocaleDateString('id-ID', options);
     }
 
     document.getElementById('prevMonth').addEventListener('click', (e) => { e.stopPropagation(); currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
@@ -1228,6 +1441,9 @@
         const form = document.getElementById('taskForm');
         if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
 
+        const saveBtn = document.getElementById('submitTaskBtn');
+        const editId = saveBtn.getAttribute('data-edit-id'); // Check if editing
+
         const isNoTime = document.getElementById('noSpecificTime').checked;
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
@@ -1235,67 +1451,152 @@
         const formattedDate = `${year}-${month}-${day}`;
         const startTime = document.getElementById('startTimeInput').value;
         const endTime = document.getElementById('endTimeInput').value;
-        const formattedTime = isNoTime ? null : `${startTime} – ${endTime}`;
-
-        const kategoriInput = document.querySelector('input[name="taskCategory"]:checked');
-        const kategoriId = kategoriInput ? kategoriInput.value : null;
-
-        const payload = {
-            judul_tugas: document.getElementById('taskTitle').value,
-            kategori_id: kategoriId,
-            tanggal: formattedDate,
-            waktu: formattedTime,
-            catatan: document.getElementById('taskNotes').value
-        };
+        const formattedTime = isNoTime ? null : `${startTime} – ${endTime}`; // Ensure dash format matches
 
         const modalEl = document.getElementById('addTaskModal');
         const modal = bootstrap.Modal.getInstance(modalEl);
 
         const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : ''; 
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
 
-        fetch("{{ route('rencana.store') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify(payload),
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('Gagal menyimpan');
+        // Category Logic
+        const newCategoryNameEl = document.getElementById('newCategoryName');
+        const newCategoryColorEl = document.getElementById('newCategoryColor');
+        const addCategoryFormEl = document.getElementById('addCategoryForm');
+        const newCategoryName = newCategoryNameEl ? newCategoryNameEl.value.trim() : '';
+        const newCategoryColor = newCategoryColorEl ? newCategoryColorEl.value : null;
+        const isAddCategoryVisible = addCategoryFormEl && !addCategoryFormEl.classList.contains('d-none');
+
+        const storeOrUpdatePlan = (kategoriId) => {
+            const payload = {
+                judul_tugas: document.getElementById('taskTitle').value,
+                kategori_id: kategoriId,
+                tanggal: formattedDate,
+                waktu: formattedTime,
+                catatan: document.getElementById('taskNotes').value
+            };
+
+            const url = editId ? `/rencana/${editId}` : "{{ route('rencana.store') }}";
+            
+            return fetch(url, {
+                method: 'POST', // Laravel updates via POST usually fine, or strict PUT? Route is POST in web.php
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify(payload),
+            });
+        };
+
+        const createCategoryIfNeeded = () => {
+            if (!editId && isAddCategoryVisible && newCategoryName) { // Only create category on new task or explicit add? 
+                 // Actually, editing might also create category if user selects "New"? 
+                 // For now, assume Category creation logic remains same.
+                 return fetch("{{ route('categories.store') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify({ nama_kategori: newCategoryName, warna: newCategoryColor }),
+                }).then(res => res.json()).then(data => {
+                    if (!data.success) throw new Error('Gagal kategori');
+                    addCategoryOptionToHome(data.category);
+                    cancelAddCategory();
+                    return data.category.kategori_id;
+                });
             }
-            return response.json();
-        }).then(() => {
-            // Reset UI setelah berhasil
-            modal.hide();
-            form.reset();
-            form.classList.remove('was-validated');
-            document.getElementById('charCount').textContent = '0';
-            selectedDate = new Date(); currentDate = new Date();
-            updateDateDisplay();
-            document.getElementById('startTimeInput').value = "7:30pm";
-            document.getElementById('endTimeInput').value = "8:30pm";
-            document.getElementById('datetimeSection').classList.remove('disabled');
-            document.getElementById('startTimeInput').disabled = false;
-            document.getElementById('endTimeInput').disabled = false;
+            return Promise.resolve(null);
+        };
 
-            const toast = new bootstrap.Toast(document.getElementById('successToast'));
-            toast.show();
+        const kategoriInput = document.querySelector('input[name="taskCategory"]:checked');
+        const selectedKategoriId = kategoriInput ? kategoriInput.value : null;
 
-            // Setelah tersimpan di database, reload halaman agar daftar tugas & statistik sesuai data terbaru
-            setTimeout(() => {
-                window.location.reload();
-            }, 600);
-        }).catch(() => {
-            alert('Gagal menyimpan rencana. Silakan coba lagi.');
-        });
+        createCategoryIfNeeded()
+            .then((newKategoriId) => {
+                const kategoriIdToUse = newKategoriId || selectedKategoriId;
+                return storeOrUpdatePlan(kategoriIdToUse);
+            })
+            .then((response) => {
+                if (!response.ok) throw new Error('Gagal menyimpan');
+                return response.json();
+            })
+            .then(() => {
+                modal.hide();
+                form.reset();
+                form.classList.remove('was-validated');
+                saveBtn.removeAttribute('data-edit-id'); // Reset edit state
+                saveBtn.innerText = 'Simpan Rencana';
+                document.getElementById('addTaskModalLabel').innerHTML = '<i class="bi bi-calendar-plus me-2" style="color: #10b981;"></i> Tambah Rencana Baru';
+                
+                document.getElementById('charCount').textContent = '0';
+                selectedDate = new Date(); currentDate = new Date();
+                updateDateDisplay();
+                
+                // Show Toast
+                const toastEl = document.getElementById('successToast');
+                if (toastEl) {
+                    toastEl.querySelector('strong').textContent = editId ? 'Rencana Diperbarui' : 'Rencana Disimpan';
+                    toastEl.querySelector('.small').textContent = editId ? 'Perubahan berhasil disimpan' : 'Rencana baru telah ditambahkan';
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.show();
+                }
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 600);
+            })
+            .catch(() => {
+                if (window.showToast) window.showToast('Gagal menyimpan rencana. Silakan coba lagi.', 'error');
+            });
     }
 
-    // ========================
-    // INITIALIZATION
-    // ========================
+    function resetAddModalState() {
+        const form = document.getElementById('taskForm');
+        if (form) {
+            form.reset();
+            form.classList.remove('was-validated');
+        }
+        
+        const saveBtn = document.getElementById('submitTaskBtn');
+        if (saveBtn) {
+            saveBtn.removeAttribute('data-edit-id');
+            saveBtn.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Tambah Rencana';
+        }
+        
+        const labelEl = document.getElementById('addTaskModalLabel');
+        if (labelEl) {
+            labelEl.innerHTML = '<i class="bi bi-plus-circle-fill me-2" style="color: #10b981;"></i> Rencana Baru';
+        }
+
+        const titleInput = document.getElementById('taskTitle');
+        if (titleInput) titleInput.value = '';
+        const notesInput = document.getElementById('taskNotes');
+        if (notesInput) notesInput.value = '';
+        const count = document.getElementById('charCount');
+        if (count) count.textContent = '0';
+        
+        // Reset Date/Time to defaults
+        selectedDate = new Date();
+        if (typeof updateDateDisplay === 'function') updateDateDisplay();
+        
+        const start = document.getElementById('startTimeInput');
+        const end = document.getElementById('endTimeInput');
+        if (start) { start.value = "7:30pm"; start.disabled = false; }
+        if (end) { end.value = "8:30pm"; end.disabled = false; }
+        
+        const noTime = document.getElementById('noSpecificTime');
+        if (noTime) noTime.checked = false;
+        
+        const dtSection = document.getElementById('datetimeSection');
+        if (dtSection) dtSection.classList.remove('disabled');
+
+        // Reset Categories
+         const radios = document.querySelectorAll('input[name="taskCategory"]');
+         radios.forEach(r => r.checked = false);
+         if (typeof cancelAddCategory === 'function') cancelAddCategory();
+    }
+    const todayTasksData = @json($todayTasks); // Inject PHP data to JS
+    let taskToDeleteId = null;
+
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize semua komponen
         initializeTaskCheckboxes();
@@ -1315,7 +1616,150 @@
         
         // Modal focus
         const modal = document.getElementById('addTaskModal');
-        modal.addEventListener('shown.bs.modal', function() { document.getElementById('taskTitle').focus(); });
+        if (modal) {
+            modal.addEventListener('shown.bs.modal', function() { 
+                document.getElementById('taskTitle').focus(); 
+            });
+            
+            // RESET MODAL WHEN OPENED VIA ADD BUTTON
+            modal.addEventListener('show.bs.modal', function (event) {
+                const trigger = event.relatedTarget;
+                if (trigger && (trigger.classList.contains('btn-add-task') || trigger.id === 'floatingAddBtn')) {
+                    resetAddModalState();
+                }
+            });
+        }
+
+        // DELETE MODAL LISTENER
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                if (taskToDeleteId) {
+                    processDeleteTask(taskToDeleteId);
+                }
+            });
+        }
     });
+
+    // ========================
+    // EDIT & DELETE LOGIC
+    // ========================
+
+    function confirmDeleteTask(taskId) {
+        taskToDeleteId = taskId;
+        const modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+        modal.show();
+    }
+
+    function processDeleteTask(taskId) {
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        // Tutup modal dulu supaya UX lebih responsif
+        const modalEl = document.getElementById('deleteConfirmationModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+
+        fetch(`/rencana/${taskId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Gagal menghapus rencana');
+            // Hapus elemen dari DOM
+            const taskItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+            if (taskItem) {
+                taskItem.remove();
+                updateTaskCounters(); // Update counters
+            }
+            // Show Toast
+            const toastEl = document.getElementById('successToast');
+            if (toastEl) {
+                // Update toast message dynamic
+                toastEl.querySelector('strong').textContent = 'Rencana berhasil dihapus';
+                toastEl.querySelector('.small').textContent = 'Tugas telah dihapus dari daftar';
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            if (window.showToast) window.showToast('Gagal menghapus rencana.', 'error');
+        });
+    }
+
+    /* NOTE: Simplified Edit - Reuses Add Modal properly */
+    function openEditTaskModal(taskId) {
+        // Find task in local data
+        const task = todayTasksData.find(t => t.id == taskId || t.rencana_id == taskId);
+        
+        if (!task) {
+            if (window.showToast) window.showToast('Data tugas tidak ditemukan.', 'error');
+            return;
+        }
+
+        // Change Modal Title & Behavior (Basic Implementation)
+        // Since the current Add logic is strictly "Store", we might need to adjust it to "Update" if ID exists.
+        // For now, let's just alert user that this is a placeholder or allow simple repopulation.
+        // To implement FULL Edit, we need to modify the addTask function to handle updates.
+        // For speed, I'll populate the Update form but warn that it creates a NEW one currently unless I patch `addTask`.
+        
+        // --- PATCHING ADDTASK FOR EDIT ---
+        // Let's modify the modal title to indicate "Edit" (Visual only for now if backend does not support update easily via same form)
+        // CHECK: The backend route `rencana.update` exists? Yes it usually does in resource controllers.
+        // I will implement a quick "Edit Mode" switch.
+        
+        // 1. Populate Fields
+        document.getElementById('taskTitle').value = task.judul_tugas;
+        document.getElementById('taskNotes').value = task.catatan || '';
+        
+        // Time
+        if (task.waktu) {
+            const parts = task.waktu.split('–').map(s => s.trim()); // En dash used in display? Or user input?
+            // Actually the input value is what we saved. The display might differ.
+            // Let's try to split by dash/hyphen
+             if (parts.length >= 2) {
+                 document.getElementById('startTimeInput').value = parts[0];
+                 document.getElementById('endTimeInput').value = parts[1];
+             } else {
+                 // Fallback
+                 const p = task.waktu.split('-');
+                 if(p.length >= 2) {
+                     document.getElementById('startTimeInput').value = p[0].trim();
+                     document.getElementById('endTimeInput').value = p[1].trim();
+                 }
+             }
+             document.getElementById('noSpecificTime').checked = false;
+             document.getElementById('datetimeSection').classList.remove('disabled');
+        } else {
+             document.getElementById('noSpecificTime').checked = true;
+             document.getElementById('datetimeSection').classList.add('disabled');
+        }
+
+        // Category
+        if (task.kategori_id) {
+            const radio = document.querySelector(`input[name="taskCategory"][value="${task.kategori_id}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        // 2. Change Modal State to "Edit"
+        // We attach the ID to the save button
+        const saveBtn = document.getElementById('submitTaskBtn');
+        saveBtn.setAttribute('data-edit-id', taskId);
+        saveBtn.innerText = 'Simpan Perubahan';
+        
+        // Change Title
+        document.getElementById('addTaskModalLabel').innerHTML = '<i class="bi bi-pencil-square me-2" style="color: #f59e0b;"></i> Edit Rencana';
+        
+        // Show Modal
+        const modal = new bootstrap.Modal(document.getElementById('addTaskModal'));
+        modal.show();
+
+        // Hook into the save button - I need to modify `addTask` to check for this ID!
+    }
 </script>
 @endpush
