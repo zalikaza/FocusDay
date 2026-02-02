@@ -1,759 +1,124 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - FocusDay</title>
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-    
-    <!-- Google Fonts - Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap 5.3.2 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            overflow: hidden;
-            transition: background-color 0.3s ease;
-        }
-
-        /* ===============================
-           SPLIT SCREEN CONTAINER
-           =============================== */
-        .login-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ===============================
-           LEFT SIDE - ANIMATED GREEN BG
-           =============================== */
-        .left-section {
-            flex: 1;
-            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: background 0.3s ease;
-        }
-
-        /* Dark Mode Left */
-        [data-theme="dark"] .left-section {
-            background: linear-gradient(135deg, #047857 0%, #065f46 50%, #064e3b 100%);
-        }
-
-        /* Logo in LEFT Section */
-        .left-logo {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            z-index: 10;
-        }
-
-        .left-logo .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .left-logo .logo-icon svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .left-logo .brand-name {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: white;
-            margin: 0;
-        }
-
-        /* Animated Background Shapes */
-        .animated-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.15;
-            animation: float-shape 20s ease-in-out infinite;
-        }
-
-        .shape-1 {
-            width: 300px;
-            height: 300px;
-            background: #ffffff;
-            border-radius: 50%;
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .shape-2 {
-            width: 200px;
-            height: 200px;
-            background: #ffffff;
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            bottom: 20%;
-            right: 15%;
-            animation-delay: 3s;
-        }
-
-        .shape-3 {
-            width: 150px;
-            height: 150px;
-            background: #ffffff;
-            border-radius: 50%;
-            top: 60%;
-            left: 20%;
-            animation-delay: 6s;
-        }
-
-        .shape-4 {
-            width: 250px;
-            height: 250px;
-            background: #ffffff;
-            border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
-            top: 40%;
-            right: 20%;
-            animation-delay: 9s;
-        }
-
-        @keyframes float-shape {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg) scale(1);
-            }
-            25% {
-                transform: translateY(-30px) rotate(5deg) scale(1.05);
-            }
-            50% {
-                transform: translateY(-50px) rotate(-5deg) scale(0.95);
-            }
-            75% {
-                transform: translateY(-30px) rotate(3deg) scale(1.02);
-            }
-        }
-
-        /* Illustration Content */
-        .illustration-content {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            padding: 2rem;
-            color: white;
-        }
-
-        .illustration-content h2 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .illustration-content p {
-            font-size: 1.125rem;
-            opacity: 0.95;
-            max-width: 400px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        /* ===============================
-           RIGHT SIDE - WHITE FORM
-           =============================== */
-        .right-section {
-            flex: 1;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            padding: 2rem;
-            position: relative;
-            transition: background-color 0.3s ease;
-        }
-
-        /* Dark Mode Right */
-        [data-theme="dark"] .right-section {
-            background: #1f2937;
-        }
-
-        /* Theme Toggle Button - TOP RIGHT */
-        .theme-toggle {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            width: 48px;
-            height: 48px;
-            background: #f3f4f6;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            z-index: 100;
-        }
-
-        .theme-toggle:hover {
-            background: #e5e7eb;
-            transform: scale(1.05);
-        }
-
-        .theme-toggle i {
-            font-size: 1.25rem;
-            color: #374151;
-        }
-
-        [data-theme="dark"] .theme-toggle {
-            background: #374151;
-        }
-
-        [data-theme="dark"] .theme-toggle:hover {
-            background: #4b5563;
-        }
-
-        [data-theme="dark"] .theme-toggle i {
-            color: #f3f4f6;
-        }
-
-        /* Form Container - CENTERED */
-        .login-form-container {
-            width: 100%;
-            max-width: 400px;
-            margin: auto;
-        }
-
-        /* Form Heading */
-        .form-heading {
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .form-heading h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-
-        [data-theme="dark"] .form-heading h1 {
-            color: #f9fafb;
-        }
-
-        .form-heading p {
-            color: #6b7280;
-            font-size: 0.95rem;
-        }
-
-        [data-theme="dark"] .form-heading p {
-            color: #9ca3af;
-        }
-
-        /* Form Fields */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            color: #374151;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        [data-theme="dark"] .form-label {
-            color: #d1d5db;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            font-size: 1rem;
-            color: #1f2937;
-            transition: all 0.3s ease;
-            background: #ffffff;
-        }
-
-        [data-theme="dark"] .form-control {
-            background: #374151;
-            border-color: #4b5563;
-            color: #f9fafb;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #10b981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-        }
-
-        .form-control::placeholder {
-            color: #9ca3af;
-        }
-
-        [data-theme="dark"] .form-control::placeholder {
-            color: #6b7280;
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-            cursor: pointer;
-            font-size: 1.125rem;
-            transition: color 0.3s ease;
-        }
-
-        .password-toggle:hover {
-            color: #10b981;
-        }
-
-        /* Options */
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-check-input {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #d1d5db;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        [data-theme="dark"] .form-check-input {
-            border-color: #4b5563;
-            background: #374151;
-        }
-
-        .form-check-input:checked {
-            background-color: #10b981;
-            border-color: #10b981;
-        }
-
-        .form-check-label {
-            color: #6b7280;
-            font-size: 0.875rem;
-            cursor: pointer;
-        }
-
-        [data-theme="dark"] .form-check-label {
-            color: #9ca3af;
-        }
-
-        .forgot-link {
-            color: #10b981;
-            font-size: 0.875rem;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Submit Button */
-        .btn-login {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        /* Divider */
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-            color: #9ca3af;
-            font-size: 0.875rem;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e5e7eb;
-        }
-
-        [data-theme="dark"] .divider::before,
-        [data-theme="dark"] .divider::after {
-            background: #374151;
-        }
-
-        .divider span {
-            padding: 0 1rem;
-        }
-
-        /* Sign Up Link */
-        .signup-link {
-            text-align: center;
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-
-        [data-theme="dark"] .signup-link {
-            color: #9ca3af;
-        }
-
-        .signup-link a {
-            color: #10b981;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .signup-link a:hover {
-            text-decoration: underline;
-        }
-
-        /* ===============================
-           RESPONSIVE
-           =============================== */
-        @media (max-width: 768px) {
-            .login-wrapper {
-                flex-direction: column;
-            }
-
-            .left-section {
-                min-height: 35vh;
-                padding: 1.5rem 1rem;
-            }
-            
-            .left-logo {
-                top: 1.5rem;
-                left: 1.5rem;
-            }
-            
-            .left-logo .logo-icon {
-                width: 36px;
-                height: 36px;
-            }
-            
-            .left-logo .brand-name {
-                font-size: 1.125rem;
-            }
-
-            .illustration-content h2 {
-                font-size: 1.75rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .illustration-content p {
-                font-size: 0.95rem;
-            }
-
-            .right-section {
-                padding: 1.5rem 1rem;
-            }
-
-            .theme-toggle {
-                top: 1rem;
-                right: 1rem;
-                width: 44px;
-                height: 44px;
-            }
-            
-            .login-form-container {
-                max-width: 100%;
-            }
-            
-            .form-heading h1 {
-                font-size: 1.75rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .left-section {
-                min-height: 30vh;
-                padding: 1rem;
-            }
-            
-            .illustration-content h2 {
-                font-size: 1.5rem;
-            }
-            
-            .illustration-content p {
-                font-size: 0.875rem;
-                padding: 0 1rem;
-            }
-            
-            .right-section {
-                padding: 1rem;
-            }
-            
-            .form-heading h1 {
-                font-size: 1.5rem;
-            }
-            
-            .form-control {
-                padding: 0.75rem 0.875rem;
-                font-size: 1rem; /* Prevent zoom on iOS */
-            }
-            
-            .btn-login {
-                padding: 0.875rem;
-                font-size: 0.95rem;
-            }
-        }
-
-        /* Loading State */
-        .btn-login.loading {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .btn-login .spinner-border {
-            width: 1.25rem;
-            height: 1.25rem;
-            border-width: 2px;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-wrapper">
-        <!-- LEFT SECTION - ANIMATED GREEN BACKGROUND -->
-        <div class="left-section">
-            <!-- Logo - Top Left -->
-            <div class="left-logo">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 6V3C8 2.44772 8.44772 2 9 2H15C15.5523 2 16 2.44772 16 3V6H19C19.5523 6 20 6.44772 20 7V20C20 20.5523 19.5523 21 19 21H5C4.44772 21 4 20.5523 4 20V7C4 6.44772 4.44772 6 5 6H8ZM10 6H14V4H10V6Z" fill="white"/>
-                    </svg>
-                </div>
-                <h2 class="brand-name">FocusDay</h2>
-            </div>
-
-            <!-- Animated Background Shapes -->
-            <div class="animated-bg">
-                <div class="shape shape-1"></div>
-                <div class="shape shape-2"></div>
-                <div class="shape shape-3"></div>
-                <div class="shape shape-4"></div>
-            </div>
-
-            <!-- Main Content -->
-            <div class="illustration-content">
-                <h2>Selamat Datang!</h2>
-                <p>Kelola tugas harianmu dengan mudah dan tingkatkan produktivitasmu bersama FocusDay</p>
-            </div>
+@extends('layouts.auth')
+
+@section('title', 'Login - FocusDay')
+
+@section('hero-title', 'Selamat Datang!')
+@section('hero-subtitle', 'Kelola tugas harianmu dengan mudah dan tingkatkan produktivitasmu bersama FocusDay')
+
+@section('content')
+    <h2 class="form-title">Masuk</h2>
+    <p class="form-subtitle">Masukkan kredensial Anda untuk melanjutkan</p>
+
+    @if ($errors->has('login'))
+        <div class="alert alert-danger border-0 bg-danger-subtle text-danger mb-4" role="alert" style="border-radius: 8px; font-size: 0.9rem;">
+            {{ $errors->first('login') }}
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('login.submit') }}" id="loginForm">
+        @csrf
+
+        <!-- Username Field -->
+        <div class="mb-3">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="custom-input" placeholder="Masukkan username" required autofocus value="{{ old('username') }}">
+            @error('username')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
         </div>
 
-        <!-- RIGHT SECTION - LOGIN FORM -->
-        <div class="right-section">
-            <!-- Theme Toggle - Top Right -->
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
-                <i class="bi bi-moon" id="themeIcon"></i>
-            </button>
+        <!-- Password Field -->
+        <div class="mb-3">
+            <label for="password">Password</label>
+            <div class="password-group">
+                <input type="password" id="password" name="password" class="custom-input" placeholder="Masukkan password" required>
+                <button type="button" class="password-toggle">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            @error('password')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
+        </div>
 
-            <!-- Form Container - Centered -->
-            <div class="login-form-container">
-                <!-- Form Heading -->
-                <div class="form-heading">
-                    <h1>Masuk</h1>
-                    <p>Masukkan kredensial Anda untuk melanjutkan</p>
-                    @if ($errors->has('login'))
-                        <div class="alert alert-danger mt-3 mb-0 p-2" style="font-size: 0.85rem;">
-                            {{ $errors->first('login') }}
+        <!-- Remember & Forgot Password -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="remember" id="remember" style="cursor: pointer; border-color: var(--border-color);">
+                <label class="form-check-label text-muted small" for="remember" style="margin-bottom: 0; font-weight: 400; cursor: pointer;">
+                    Ingat saya
+                </label>
+            </div>
+            <a href="#" class="text-link small">Lupa password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-main" id="loginBtn">Masuk</button>
+
+        <!-- Divider -->
+        <div class="divider-line">
+            <span>atau</span>
+        </div>
+
+        <!-- Footer -->
+        <div class="bottom-text">
+            Belum punya akun? <a href="{{ route('register') }}" class="text-link">Buat akun</a>
+        </div>
+    </form>
+
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loginLoadingModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px; overflow: hidden;">
+                <div class="modal-body py-4 px-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="spinner-border text-success" role="status" style="width: 2rem; height: 2rem; border-width: 3px;">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
-                    @endif
-                </div>
-
-                @if (session('success'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                <!-- Login Form -->
-                <form id="loginForm" action="{{ route('login.submit') }}" method="POST">
-                    @csrf
-                    <!-- Username -->
-                    <div class="form-group">
-                        <label class="form-label" for="username">Username</label>
-                        <div class="input-wrapper">
-                            <input 
-                                type="text" 
-                                class="form-control" 
-                                id="username" 
-                                name="username"
-                                placeholder="Masukkan username"
-                                value="{{ old('username') }}"
-                                required>
-                        </div>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="form-group">
-                        <label class="form-label" for="password">Password</label>
-                        <div class="input-wrapper">
-                            <input 
-                                type="password" 
-                                class="form-control" 
-                                id="password" 
-                                name="password"
-                                placeholder="Masukkan password"
-                                required>
-                            <span class="password-toggle" onclick="togglePassword()">
-                                <i class="bi bi-eye" id="toggleIcon"></i>
-                            </span>
+                        <div>
+                            <div class="fw-bold text-dark fs-5 mb-1">Sedang Masuk...</div>
+                            <div class="text-muted small">Mohon tunggu sebentar, mengalihkan ke beranda.</div>
                         </div>
                     </div>
-
-                    <!-- Options -->
-                    <div class="form-options">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label" for="rememberMe">Ingat saya</label>
-                        </div>
-                        <a href="#" class="forgot-link">Lupa password?</a>
-                    </div>
-
-                    <!-- Submit -->
-                    <button type="submit" class="btn-login" id="loginBtn">
-                        <span id="btnText">Masuk</span>
-                        <span class="spinner-border spinner-border-sm d-none" id="btnSpinner"></span>
-                    </button>
-                </form>
-
-                <!-- Divider -->
-                <div class="divider">
-                    <span>atau</span>
-                </div>
-
-                <!-- Sign Up Link -->
-                <div class="signup-link">
-                    Belum punya akun? <a href="{{ route('register') }}">Buat akun</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
-        // Toggle Password
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggleIcon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('bi-eye');
-                toggleIcon.classList.add('bi-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('bi-eye-slash');
-                toggleIcon.classList.add('bi-eye');
-            }
-        }
-
-        // Toggle Theme
-        function toggleTheme() {
-            const html = document.documentElement;
-            const themeIcon = document.getElementById('themeIcon');
-            const currentTheme = html.getAttribute('data-theme');
-            
-            if (currentTheme === 'dark') {
-                html.removeAttribute('data-theme');
-                themeIcon.classList.remove('bi-sun');
-                themeIcon.classList.add('bi-moon');
-                localStorage.setItem('loginTheme', 'light');
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                themeIcon.classList.remove('bi-moon');
-                themeIcon.classList.add('bi-sun');
-                localStorage.setItem('loginTheme', 'dark');
-            }
-        }
-
-        // Load saved theme on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('loginTheme');
-            const html = document.documentElement;
-            const themeIcon = document.getElementById('themeIcon');
-            
-            if (savedTheme === 'dark') {
-                html.setAttribute('data-theme', 'dark');
-                themeIcon.classList.remove('bi-moon');
-                themeIcon.classList.add('bi-sun');
-            }
-        });
+            const loginForm = document.getElementById('loginForm');
+            const loginBtn = document.getElementById('loginBtn');
+            const loadingModalEl = document.getElementById('loginLoadingModal');
+            let loadingModal = null;
 
-        // Form Submit
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const btn = document.getElementById('loginBtn');
-            const btnText = document.getElementById('btnText');
-            const btnSpinner = document.getElementById('btnSpinner');
-            
-            btn.classList.add('loading');
-            btnText.classList.add('d-none');
-            btnSpinner.classList.remove('d-none');
+            // Pastikan bootstrap sudah terload
+            if (typeof bootstrap !== 'undefined' && loadingModalEl) {
+                loadingModal = new bootstrap.Modal(loadingModalEl);
+            }
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    if (!this.checkValidity()) {
+                        return;
+                    }
+
+                    e.preventDefault();
+                    
+                    if (loginBtn) {
+                        loginBtn.disabled = true;
+                        loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Memuat...';
+                    }
+
+                    if (loadingModal) {
+                        loadingModal.show();
+                    }
+
+                    setTimeout(() => {
+                        this.submit();
+                    }, 800);
+                });
+            }
         });
     </script>
-</body>
-</html>
+@endsection

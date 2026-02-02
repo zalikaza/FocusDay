@@ -79,6 +79,12 @@
                                     'yellow' => '#f59e0b',
                                     'merah' => '#ef4444',
                                     'red' => '#ef4444',
+                                    'ungu' => '#7c3aed',
+                                    'purple' => '#7c3aed',
+                                    'pink' => '#ec4899',
+                                    'abu-abu' => '#9ca3af',
+                                    'gray' => '#9ca3af',
+                                    'grey' => '#9ca3af',
                                 ];
                                 $cssColor = $colorMap[$warnaLower] ?? ($warna ?: '#2563eb');
                             @endphp
@@ -199,23 +205,58 @@
                             </button>
                         </label>
                         <div class="d-flex flex-wrap gap-2" id="categorySelection">
-                            <!-- Default Categories -->
-                            <input type="radio" class="btn-check" name="taskCategory" id="categoryWork" value="work" autocomplete="off" checked>
-                            <label class="btn btn-sm btn-category btn-work" for="categoryWork">
-                                <i class="bi bi-briefcase me-1"></i>Kerja
-                            </label>
-                            
-                            <input type="radio" class="btn-check" name="taskCategory" id="categoryLearning" value="learning" autocomplete="off">
-                            <label class="btn btn-sm btn-category btn-learning" for="categoryLearning">
-                                <i class="bi bi-book me-1"></i>Belajar
-                            </label>
-                            
-                            <input type="radio" class="btn-check" name="taskCategory" id="categoryPersonal" value="personal" autocomplete="off">
-                            <label class="btn btn-sm btn-category btn-personal" for="categoryPersonal">
-                                <i class="bi bi-person me-1"></i>Pribadi
-                            </label>
-                            
-                            <!-- Dynamic Categories Container -->
+                            @forelse($categories as $index => $category)
+                                @php
+                                    $inputId = 'categoryDb_' . $category->kategori_id;
+                                    $isFirst = $index === 0;
+                                    $warna = trim($category->warna ?? '');
+                                    $warnaLower = strtolower($warna);
+                                    $colorMap = [
+                                        'biru' => ['bg' => '#dbeafe', 'text' => '#1e40af'],
+                                        'blue' => ['bg' => '#dbeafe', 'text' => '#1e40af'],
+                                        'hijau' => ['bg' => '#d1fae5', 'text' => '#065f46'],
+                                        'green' => ['bg' => '#d1fae5', 'text' => '#065f46'],
+                                        'kuning' => ['bg' => '#fef3c7', 'text' => '#92400e'],
+                                        'yellow' => ['bg' => '#fef3c7', 'text' => '#92400e'],
+                                        'merah' => ['bg' => '#fee2e2', 'text' => '#991b1b'],
+                                        'red' => ['bg' => '#fee2e2', 'text' => '#991b1b'],
+                                        'ungu' => ['bg' => '#ede9fe', 'text' => '#5b21b6'],
+                                        'purple' => ['bg' => '#ede9fe', 'text' => '#5b21b6'],
+                                        'pink' => ['bg' => '#fce7f3', 'text' => '#9d174d'],
+                                        'abu-abu' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                        'gray' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                        'grey' => ['bg' => '#f3f4f6', 'text' => '#374151'],
+                                    ];
+                                    $darkMap = [
+                                        'biru' => ['bg' => 'rgba(37, 99, 235, 0.15)', 'text' => '#93c5fd', 'border' => 'rgba(59, 130, 246, 0.3)'],
+                                        'blue' => ['bg' => 'rgba(37, 99, 235, 0.15)', 'text' => '#93c5fd', 'border' => 'rgba(59, 130, 246, 0.3)'],
+                                        'hijau' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'text' => '#6ee7b7', 'border' => 'rgba(16, 185, 129, 0.3)'],
+                                        'green' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'text' => '#6ee7b7', 'border' => 'rgba(16, 185, 129, 0.3)'],
+                                        'kuning' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'text' => '#fcd34d', 'border' => 'rgba(245, 158, 11, 0.3)'],
+                                        'yellow' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'text' => '#fcd34d', 'border' => 'rgba(245, 158, 11, 0.3)'],
+                                        'merah' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'text' => '#fca5a5', 'border' => 'rgba(239, 68, 68, 0.3)'],
+                                        'red' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'text' => '#fca5a5', 'border' => 'rgba(239, 68, 68, 0.3)'],
+                                        'ungu' => ['bg' => 'rgba(124, 58, 237, 0.15)', 'text' => '#ddd6fe', 'border' => 'rgba(124, 58, 237, 0.3)'],
+                                        'purple' => ['bg' => 'rgba(124, 58, 237, 0.15)', 'text' => '#ddd6fe', 'border' => 'rgba(124, 58, 237, 0.3)'],
+                                        'pink' => ['bg' => 'rgba(236, 72, 153, 0.15)', 'text' => '#fbcfe8', 'border' => 'rgba(236, 72, 153, 0.3)'],
+                                        'abu-abu' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                        'gray' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                        'grey' => ['bg' => 'rgba(156, 163, 175, 0.15)', 'text' => '#e5e7eb', 'border' => 'rgba(156, 163, 175, 0.3)'],
+                                    ];
+                                    $cssBg = $colorMap[$warnaLower]['bg'] ?? '#f3f4f6';
+                                    $cssText = $colorMap[$warnaLower]['text'] ?? '#374151';
+                                    $darkBg = $darkMap[$warnaLower]['bg'] ?? 'rgba(156, 163, 175, 0.15)';
+                                    $darkText = $darkMap[$warnaLower]['text'] ?? '#e5e7eb';
+                                    $darkBorder = $darkMap[$warnaLower]['border'] ?? 'rgba(156, 163, 175, 0.3)';
+                                @endphp
+                                <input type="radio" class="btn-check" name="taskCategory" id="{{ $inputId }}" value="{{ $category->kategori_id }}" autocomplete="off" @checked($isFirst)>
+                                <label class="btn btn-sm btn-category" for="{{ $inputId }}" style="--pill-bg: {{ $cssBg }}; --pill-text: {{ $cssText }}; --pill-bg-dark: {{ $darkBg }}; --pill-text-dark: {{ $darkText }}; --pill-border-dark: {{ $darkBorder }};">
+                                    <i class="bi bi-tag me-1"></i>{{ $category->nama_kategori }}
+                                </label>
+                            @empty
+                                <span class="text-muted small" id="emptyCategoryHint">Belum ada kategori. Tambah kategori dulu.</span>
+                            @endforelse
+
                             <div id="additionalCategories"></div>
                         </div>
                     </div>
@@ -305,8 +346,20 @@
                                id="newCategoryName" 
                                placeholder="Nama kategori baru"
                                style="border-radius: 8px 0 0 8px;">
-                        <button class="btn btn-outline-success" type="button" onclick="addNewCategory()" style="border-radius: 0 8px 8px 0;">
+                        <select class="form-select" id="newCategoryColor" aria-label="Pilih warna kategori" style="max-width: 140px;">
+                            <option value="biru" selected>Biru</option>
+                            <option value="hijau">Hijau</option>
+                            <option value="kuning">Kuning</option>
+                            <option value="merah">Merah</option>
+                            <option value="ungu">Ungu</option>
+                            <option value="pink">Pink</option>
+                            <option value="abu-abu">Abu-abu</option>
+                        </select>
+                        <button class="btn btn-outline-success" type="button" onclick="addNewCategory()" aria-label="Simpan kategori" style="border-radius: 0;">
                             <i class="bi bi-check-lg"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" type="button" onclick="cancelAddCategory()" aria-label="Batal" style="border-radius: 0 8px 8px 0;">
+                            <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
                 </div>
@@ -320,6 +373,25 @@
                 <button type="button" class="btn btn-success btn-lg px-4" onclick="saveTask()" id="submitTaskBtn" style="border-radius: 10px;">
                     <i class="bi bi-plus-circle me-2"></i><span id="btnText">Tambah Tugas</span>
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-circle text-warning display-4"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Hapus Rencana?</h5>
+                <p class="text-muted small mb-4">Apakah Anda yakin ingin menghapus rencana ini? Tindakan ini tidak dapat dibatalkan.</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
+                    <button type="button" class="btn btn-danger w-100" id="confirmDeleteBtn" style="border-radius: 8px;">Hapus</button>
+                </div>
             </div>
         </div>
     </div>
@@ -497,49 +569,120 @@
     /* Modal Styles */
     .modal-content { border-radius: 16px; }
     
-    .task-item-modal {
-        padding: 0.875rem;
+    /* Task Item in Modal with Checkbox */
+    .task-item-modal-wrapper {
+        padding: 1rem;
         border-left: 3px solid;
         background-color: #f9fafb;
-        border-radius: 6px;
-        margin-bottom: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 0.875rem;
         transition: all 0.2s ease;
-        cursor: pointer; /* Indicate clickable */
-        position: relative;
     }
     
-    html[data-theme="dark"] .task-item-modal {
+    html[data-theme="dark"] .task-item-modal-wrapper {
         background-color: rgba(255, 255, 255, 0.03);
     }
     
-    .task-item-modal:hover {
-        transform: translateX(4px);
+    .task-item-modal-wrapper:hover {
         background-color: #f3f4f6;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    html[data-theme="dark"] .task-item-modal-wrapper:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Checkbox Styling */
+    .task-checkbox-wrapper {
+        flex-shrink: 0;
+        padding-top: 2px;
     }
 
-    html[data-theme="dark"] .task-item-modal:hover {
-        background-color: rgba(255, 255, 255, 0.06);
+    .task-completed {
+        text-decoration: line-through !important;
+        text-decoration-thickness: 2px !important;
+        text-decoration-color: #10b981 !important;
+        color: #9ca3af !important;
+        opacity: 0.7;
     }
 
-    /* Edit Icon Indicator on Hover */
-    .task-item-modal::after {
-        content: "\F4CB"; /* Bootstrap pencil icon unicode */
-        font-family: "bootstrap-icons";
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
+    html[data-theme="dark"] .task-completed {
+        color: #9ca3af !important;
+    }
+
+    .form-check-input.task-checkbox {
+        width: 1.2rem;
+        height: 1.2rem;
+        cursor: pointer;
+        border: 2px solid #d1d5db;
+        transition: all 0.2s ease;
+    }
+
+    .form-check-input.task-checkbox:checked {
+        background-color: #10b981;
+        border-color: #10b981;
+    }
+
+    .form-check-input.task-checkbox:focus {
+        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+    }
+
+    .form-check-input.task-checkbox:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    /* Time and Edit Icon Wrapper */
+    .task-time-edit-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+    }
+    
+    /* Edit Icon - Hidden by default */
+    .task-edit-icon {
         opacity: 0;
-        color: #6b7280;
-        transition: opacity 0.2s;
+        visibility: hidden;
+        transform: translateX(-5px);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        border: none;
+        background: transparent;
     }
-    .task-item-modal:hover::after { opacity: 1; }
-
-    html[data-theme="dark"] .task-item-modal::after {
-        color: #d1d5db;
+    
+    .task-item-modal-wrapper:hover .task-edit-icon {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+    }
+    
+    .task-edit-icon:hover {
+        background-color: transparent !important;
+    }
+    
+    .task-edit-icon i {
+        font-size: 0.95rem;
+        transition: transform 0.2s ease;
+        color: inherit;
+        opacity: inherit;
+    }
+    
+    .task-edit-icon:hover i {
+        transform: scale(1.1);
+    }
+    
+    /* Task Time Text */
+    .task-time-text {
+        white-space: nowrap;
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .task-item-modal-wrapper:hover .task-time-text {
+        transform: translateX(-3px);
     }
 
+    /* Old task modal classes - keeping for backward compatibility if needed */
     .task-item-modal.task-work { border-left-color: #2563eb; }
     .task-item-modal.task-learning { border-left-color: #10b981; }
     .task-item-modal.task-personal { border-left-color: #f59e0b; }
@@ -585,12 +728,17 @@
         font-size: 0.85rem;
         transition: all 0.2s ease;
         font-weight: 500;
+        background-color: var(--pill-bg, #f3f4f6) !important;
+        color: var(--pill-text, #374151) !important;
+        border-color: var(--pill-bg, #f3f4f6) !important;
     }
-    
-    .btn-work { color: #1e40af; background-color: #dbeafe; border-color: #dbeafe; }
-    .btn-learning { color: #065f46; background-color: #d1fae5; border-color: #d1fae5; }
-    .btn-personal { color: #92400e; background-color: #fef3c7; border-color: #fef3c7; }
-    
+
+    html[data-theme="dark"] .btn-category {
+        background-color: var(--pill-bg-dark, rgba(148, 163, 184, 0.12)) !important;
+        color: var(--pill-text-dark, #e5e7eb) !important;
+        border-color: var(--pill-border-dark, rgba(148, 163, 184, 0.25)) !important;
+    }
+
     .btn-check:checked + .btn-category {
         border-color: #10b981;
         box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
@@ -848,6 +996,7 @@
     let isEditing = false;
     let editTargetDate = null;
     let editTargetIndex = null;
+    let editTargetPlanId = null;
 
     // Data rencana asli dari backend (tabel rencana + kategori)
     const backendPlans = @json($plans);
@@ -867,6 +1016,12 @@
             'yellow': '#f59e0b',
             'merah': '#ef4444',
             'red': '#ef4444',
+            'ungu': '#7c3aed',
+            'purple': '#7c3aed',
+            'pink': '#ec4899',
+            'abu-abu': '#9ca3af',
+            'gray': '#9ca3af',
+            'grey': '#9ca3af',
         };
         // Kalau warna dikenali di map → pakai itu, kalau tidak → pakai nilai aslinya
         // (fallback terakhir tetap abu-abu kalau entah kenapa masih falsy)
@@ -880,6 +1035,7 @@
         time: p.waktu,
         notes: p.catatan,
         status: p.status,
+        category_id: p.kategori_id,
         category_name: p.nama_kategori,
         color: resolveCategoryColor(p.warna),
     }));
@@ -907,7 +1063,6 @@
         setupMainCalendarListeners();
         setupModalFormLogic();
         updateStats();
-        loadCategoryOptionsFromStorage();
     });
 
     function updateStats() {
@@ -989,51 +1144,90 @@
         }
     }
 
-    function showTaskDetails(date, tasks) {
+    // Helper to render the inner list HTML without touching the modal instance
+    function renderTaskDetailList(date, tasks) {
+        // Update selected global date just in case
+        selectedCalendarDateString = date; 
+        
         const dateObj = new Date(date);
         const options = { day: 'numeric', month: 'long', year: 'numeric' };
         const formattedDate = dateObj.toLocaleDateString('id-ID', options);
-        selectedCalendarDateString = date;
         document.getElementById('modalDate').textContent = formattedDate;
-        
+
         let tasksHtml = '';
 
         if (!tasks || tasks.length === 0) {
             tasksHtml = `
-                <div class="empty-plan text-center">
-                    <p class="text-muted mb-3">Tidak ada Rencana</p>
-                    <!-- Tombol tambah rencana dari state kosong (opsional, karena footer sudah ada tombol) -->
+                <div class="empty-plan text-center py-4">
+                    <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-2130362-1800926.png" alt="Empty" style="width: 120px; opacity: 0.5;" class="mb-3">
+                    <p class="text-muted mb-0">Tidak ada agenda tertulis.</p>
                 </div>
             `;
         } else {
             tasks.forEach((task, index) => {
-                // Default abu-abu kalau tidak ada kategori/warna
                 const color = task.color || '#9ca3af';
                 const categoryName = task.category_name || 'Kategori';
                 const timeText = task.time || 'All Day';
+                const isCompleted = task.status === 'selesai';
+                const taskId = task.id || null;
 
                 tasksHtml += `
-                    <div class="task-item-modal" style="border-left-color: ${color};" onclick="bukaModalEdit('${date}', ${index})">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1 fw-semibold">${task.title}</h6>
-                                <span class="badge rounded-pill category-badge" style="background-color: ${color}1A; color: ${color}; border: 1px solid ${color}33;">
-                                    ${categoryName}
-                                </span>
+                    <div class="task-item-modal-wrapper" style="border-left-color: ${color};">
+                        <div class="d-flex align-items-start gap-3">
+                            <!-- Checkbox -->
+                            <div class="task-checkbox-wrapper">
+                                <input type="checkbox" 
+                                       class="form-check-input task-checkbox" 
+                                       ${isCompleted ? 'checked' : ''} 
+                                       ${taskId ? `data-task-id="${taskId}"` : 'disabled'}
+                                       onclick="event.stopPropagation(); toggleTaskStatus(this, '${date}', ${index})"
+                                       style="cursor: pointer; width: 20px; height: 20px;">
                             </div>
-                            <small class="text-muted">
-                                <i class="bi bi-clock me-1"></i>${timeText}
-                            </small>
+                            
+                            <!-- Content -->
+                            <div class="task-content-wrapper flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold ${isCompleted ? 'task-completed' : ''}">${task.title}</h6>
+                                        <span class="badge rounded-pill category-badge" style="background-color: ${color}1A; color: ${color}; border: 1px solid ${color}33;">
+                                            ${categoryName}
+                                        </span>
+                                    </div>
+                                    <div class="task-time-edit-wrapper">
+                                        <small class="text-muted task-time-text">
+                                            <i class="bi bi-clock me-1"></i>${timeText}
+                                        </small>
+                                        <!-- Edit Button -->
+                                        <button class="btn btn-sm btn-link text-muted task-edit-icon p-0 ms-2" 
+                                                onclick="event.stopPropagation(); bukaModalEdit('${date}', ${index})"
+                                                title="Edit tugas">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <!-- Delete Button (Grey/Muted as requested) -->
+                                        <button class="btn btn-sm btn-link text-muted task-edit-icon p-0 ms-1" 
+                                                onclick="event.stopPropagation(); konfirmasiHapusTugas('${taskId}', '${date}', ${index})"
+                                                title="Hapus tugas">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                ${task.notes ? `<p class="text-muted small mb-0 mt-2">${task.notes}</p>` : ''}
+                            </div>
                         </div>
-                        ${task.notes ? `<p class="text-muted small mb-0 mt-2">${task.notes}</p>` : ''}
                     </div>
                 `;
             });
         }
         
         document.getElementById('taskDetailBody').innerHTML = tasksHtml;
-        
-        const modal = new bootstrap.Modal(document.getElementById('taskDetailModal'));
+    }
+
+    // Main function to open modal
+    function showTaskDetails(date, tasks) {
+        renderTaskDetailList(date, tasks);
+        // Use getOrCreateInstance to check existing state
+        const modalEl = document.getElementById('taskDetailModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
     }
 
@@ -1075,6 +1269,7 @@
         isEditing = true;
         editTargetDate = dateString;
         editTargetIndex = index;
+        editTargetPlanId = task.id || null;
 
         document.getElementById('addTaskModal').classList.add('is-editing-mode');
         document.querySelector('#addTaskModalLabel i').className = 'bi bi-pencil-square-fill me-2';
@@ -1089,7 +1284,7 @@
         
         const radios = document.getElementsByName('taskCategory');
         for(let r of radios) {
-            if(r.value === task.category_name) r.checked = true;
+            if (String(r.value) === String(task.category_id)) r.checked = true;
         }
 
         const [y, m, d] = dateString.split('-').map(Number);
@@ -1128,6 +1323,7 @@
         isEditing = false;
         editTargetDate = null;
         editTargetIndex = null;
+        editTargetPlanId = null;
 
         document.getElementById('addTaskModal').classList.remove('is-editing-mode');
         document.querySelector('#addTaskModalLabel i').className = 'bi bi-plus-circle-fill me-2';
@@ -1165,76 +1361,78 @@
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const day = String(selectedDate.getDate()).padStart(2, '0');
-        const newFormattedDate = `${year}-${month}-${day}`;
+        const formattedDate = `${year}-${month}-${day}`;
         
         const startTime = document.getElementById('startTimeInput').value;
         const endTime = document.getElementById('endTimeInput').value;
         const formattedTime = isNoTime ? null : `${startTime} – ${endTime}`;
 
-        // Untuk data yang dibuat dari halaman ini (belum tersimpan ke DB),
-        // kita tetap masukkan ke tasksData agar muncul di tampilan kalender.
-        const selectedCategoryInput = document.querySelector('input[name="taskCategory"]:checked');
-        const selectedCategoryLabel = selectedCategoryInput
-            ? (document.querySelector(`label[for="${selectedCategoryInput.id}"]`)?.innerText.trim() || 'Kategori')
-            : 'Kategori';
+        const kategoriInput = document.querySelector('input[name="taskCategory"]:checked');
+        const kategoriId = kategoriInput ? kategoriInput.value : null;
 
-        const taskData = {
-            id: null,
-            title: document.getElementById('taskTitle').value,
-            date: newFormattedDate,
-            time: formattedTime || '',
-            notes: document.getElementById('taskNotes').value,
-            status: null,
-            category_name: selectedCategoryLabel,
-            color: '#10b981',
+        const payload = {
+            judul_tugas: document.getElementById('taskTitle').value,
+            kategori_id: kategoriId,
+            tanggal: formattedDate,
+            waktu: formattedTime,
+            catatan: document.getElementById('taskNotes').value
         };
 
-        if (isEditing) {
-            if (tasksData[editTargetDate]) {
-                tasksData[editTargetDate].splice(editTargetIndex, 1);
-                if (tasksData[editTargetDate].length === 0) delete tasksData[editTargetDate];
-            }
+        const modalEl = document.getElementById('addTaskModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
 
-            if (!tasksData[newFormattedDate]) tasksData[newFormattedDate] = [];
-            tasksData[newFormattedDate].push(taskData);
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
 
-            tasksData[newFormattedDate].sort((a, b) => {
-                if(!a.time) return 1;
-                if(!b.time) return -1;
-                return a.time.localeCompare(b.time);
+        createCategoryIfNeeded(csrfToken)
+            .then(newKategoriId => {
+                const kategoriIdToUse = newKategoriId || payload.kategori_id;
+                const finalPayload = { ...payload, kategori_id: kategoriIdToUse };
+
+                if (isEditing && editTargetPlanId) {
+                    return fetch(`/rencana/${editTargetPlanId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify(finalPayload),
+                    });
+                }
+
+                return fetch("{{ route('rencana.store') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify(finalPayload),
+                });
+            })
+            .then(response => {
+                if (!response || !response.ok) throw new Error('Gagal menyimpan');
+                return response.json().catch(() => ({}));
+            })
+            .then(() => {
+                if (modal) modal.hide();
+                form.reset();
+                form.classList.remove('was-validated');
+                document.getElementById('charCount').textContent = '0';
+
+                const toast = new bootstrap.Toast(document.getElementById('successToast'));
+                toast.show();
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 600);
+            })
+            .catch(() => {
+                if (window.showToast) {
+                    window.showToast('Gagal menyimpan rencana. Silakan coba lagi.', 'error');
+                }
             });
-
-            document.getElementById('toastMessage').innerText = "Perubahan berhasil disimpan!";
-            document.getElementById('toastSubMessage').innerText = "Data telah diperbarui.";
-
-        } else {
-            if (!tasksData[newFormattedDate]) tasksData[newFormattedDate] = [];
-            tasksData[newFormattedDate].push(taskData);
-            
-            document.getElementById('toastMessage').innerText = "Rencana berhasil ditambahkan!";
-            document.getElementById('toastSubMessage').innerText = "Tugas telah masuk ke kalender";
-        }
-        
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addTaskModal'));
-        modal.hide();
-        resetFormState();
-        
-        renderCalendar();
-        updateStats();
-
-        const detailModalEl = document.getElementById('taskDetailModal');
-        const detailInstance = bootstrap.Modal.getInstance(detailModalEl);
-        
-        if (detailInstance && detailInstance._isShown) {
-            if (selectedCalendarDateString) {
-                 const currentTasks = tasksData[selectedCalendarDateString] || [];
-                 showTaskDetails(selectedCalendarDateString, currentTasks);
-                 detailInstance.show(); 
-            }
-        }
-
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        toast.show();
     }
 
     // ============================
@@ -1309,22 +1507,25 @@
     function renderModalCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        const monthNamesEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        calendarTitle.textContent = `${monthNamesEn[month]} ${year}`;
+        const monthNamesId = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        calendarTitle.textContent = `${monthNamesId[month]} ${year}`;
         
-        const headers = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+        const headers = (weekStart === 1) ? ['Sen','Sel','Rab','Kam','Jum','Sab','Min'] : ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
         modalCalendarGrid.innerHTML = headers.map(h => `<div class="calendar-day-label">${h}</div>`).join('');
         
-        const firstDayIndex = new Date(year, month, 1).getDay();
+        const firstDayIndexRaw = new Date(year, month, 1).getDay();
+        const firstDayIndex = (firstDayIndexRaw - weekStart + 7) % 7;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = new Date();
-
+        
+        // Previous Month
         for (let i = 0; i < firstDayIndex; i++) {
             const emptyDiv = document.createElement('div');
             emptyDiv.className = 'calendar-day empty';
             modalCalendarGrid.appendChild(emptyDiv);
         }
 
+        // Current Month
         for (let i = 1; i <= daysInMonth; i++) {
             const dayEl = document.createElement('div');
             dayEl.className = 'calendar-day';
@@ -1343,9 +1544,8 @@
     }
 
     function updateDateDisplay() {
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const parts = selectedDate.toLocaleDateString('en-US', options).split(',');
-        dateText.textContent = `${parts[0]}, ${parts[1]}`;
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        dateText.textContent = selectedDate.toLocaleDateString('id-ID', options);
     }
 
     function generateTimeOptions() {
@@ -1447,64 +1647,303 @@
     // ============================
     // 4. CUSTOM CATEGORY LOGIC
     // ============================
-    const STORAGE_KEY_CATEGORIES = 'focusday.categories';
-
-    function loadCustomCategories() {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-            const parsed = raw ? JSON.parse(raw) : [];
-            return Array.isArray(parsed) ? parsed : [];
-        } catch (e) { return []; }
+    function resolveCategoryPillStyle(rawColor) {
+        const lower = String(rawColor || '').trim().toLowerCase();
+        const map = {
+            'biru': { bg: '#dbeafe', text: '#1e40af' },
+            'blue': { bg: '#dbeafe', text: '#1e40af' },
+            'hijau': { bg: '#d1fae5', text: '#065f46' },
+            'green': { bg: '#d1fae5', text: '#065f46' },
+            'kuning': { bg: '#fef3c7', text: '#92400e' },
+            'yellow': { bg: '#fef3c7', text: '#92400e' },
+            'merah': { bg: '#fee2e2', text: '#991b1b' },
+            'red': { bg: '#fee2e2', text: '#991b1b' },
+            'ungu': { bg: '#ede9fe', text: '#5b21b6' },
+            'purple': { bg: '#ede9fe', text: '#5b21b6' },
+            'pink': { bg: '#fce7f3', text: '#9d174d' },
+            'abu-abu': { bg: '#f3f4f6', text: '#374151' },
+            'gray': { bg: '#f3f4f6', text: '#374151' },
+            'grey': { bg: '#f3f4f6', text: '#374151' },
+        };
+        const darkMap = {
+            'biru': { bg: 'rgba(37, 99, 235, 0.15)', text: '#93c5fd', border: 'rgba(59, 130, 246, 0.3)' },
+            'blue': { bg: 'rgba(37, 99, 235, 0.15)', text: '#93c5fd', border: 'rgba(59, 130, 246, 0.3)' },
+            'hijau': { bg: 'rgba(16, 185, 129, 0.15)', text: '#6ee7b7', border: 'rgba(16, 185, 129, 0.3)' },
+            'green': { bg: 'rgba(16, 185, 129, 0.15)', text: '#6ee7b7', border: 'rgba(16, 185, 129, 0.3)' },
+            'kuning': { bg: 'rgba(245, 158, 11, 0.15)', text: '#fcd34d', border: 'rgba(245, 158, 11, 0.3)' },
+            'yellow': { bg: 'rgba(245, 158, 11, 0.15)', text: '#fcd34d', border: 'rgba(245, 158, 11, 0.3)' },
+            'merah': { bg: 'rgba(239, 68, 68, 0.15)', text: '#fca5a5', border: 'rgba(239, 68, 68, 0.3)' },
+            'red': { bg: 'rgba(239, 68, 68, 0.15)', text: '#fca5a5', border: 'rgba(239, 68, 68, 0.3)' },
+            'ungu': { bg: 'rgba(124, 58, 237, 0.15)', text: '#ddd6fe', border: 'rgba(124, 58, 237, 0.3)' },
+            'purple': { bg: 'rgba(124, 58, 237, 0.15)', text: '#ddd6fe', border: 'rgba(124, 58, 237, 0.3)' },
+            'pink': { bg: 'rgba(236, 72, 153, 0.15)', text: '#fbcfe8', border: 'rgba(236, 72, 153, 0.3)' },
+            'abu-abu': { bg: 'rgba(156, 163, 175, 0.15)', text: '#e5e7eb', border: 'rgba(156, 163, 175, 0.3)' },
+            'gray': { bg: 'rgba(156, 163, 175, 0.15)', text: '#e5e7eb', border: 'rgba(156, 163, 175, 0.3)' },
+            'grey': { bg: 'rgba(156, 163, 175, 0.15)', text: '#e5e7eb', border: 'rgba(156, 163, 175, 0.3)' },
+        };
+        const base = map[lower] || { bg: '#f3f4f6', text: '#374151' };
+        const dark = darkMap[lower] || { bg: 'rgba(156, 163, 175, 0.15)', text: '#e5e7eb', border: 'rgba(156, 163, 175, 0.3)' };
+        return { ...base, darkBg: dark.bg, darkText: dark.text, darkBorder: dark.border };
     }
 
-    function saveCustomCategories(items) {
-        localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(items));
-    }
-
-    function slugify(value) {
-        return value.toString().trim().toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
-    }
 
     function addCategoryOptionToHome(category) {
         const additional = document.getElementById('additionalCategories');
         if (!additional) return;
-        const categoryId = 'category' + Date.now() + Math.floor(Math.random() * 1000);
+        const categoryId = 'categoryDb_' + category.kategori_id;
+        const style = resolveCategoryPillStyle(category.warna);
         const newCategory = document.createElement('div');
-        newCategory.innerHTML = `<input type="radio" class="btn-check" name="taskCategory" id="${categoryId}" value="${category.key}" autocomplete="off"><label class="btn btn-sm btn-category" for="${categoryId}" style="background-color: ${category.bg}; color: ${category.text};"><i class="bi ${category.icon} me-1"></i>${category.label}</label>`;
+        newCategory.innerHTML = `<input type="radio" class="btn-check" name="taskCategory" id="${categoryId}" value="${category.kategori_id}" autocomplete="off"><label class="btn btn-sm btn-category" for="${categoryId}" style="--pill-bg: ${style.bg}; --pill-text: ${style.text}; --pill-bg-dark: ${style.darkBg}; --pill-text-dark: ${style.darkText}; --pill-border-dark: ${style.darkBorder};"><i class="bi bi-tag me-1"></i>${category.nama_kategori}</label>`;
         additional.appendChild(newCategory);
     }
 
-    function loadCategoryOptionsFromStorage() {
-        const additional = document.getElementById('additionalCategories');
-        if (!additional) return;
-        additional.innerHTML = '';
-        const custom = loadCustomCategories();
-        custom.forEach(cat => addCategoryOptionToHome(cat));
-    }
-
-    function showAddCategory() {
-        const form = document.getElementById('addCategoryForm');
-        form.classList.toggle('d-none');
-        if (!form.classList.contains('d-none')) document.getElementById('newCategoryName').focus();
-    }
     
     function addNewCategory() {
         const categoryName = document.getElementById('newCategoryName').value.trim();
-        if (!categoryName) return alert('Mohon isi nama kategori');
-        const colors = [{bg:'#fef3c7', text:'#92400e', icon:'bi-palette'}, {bg:'#e0e7ff', text:'#3730a3', icon:'bi-star'}, {bg:'#fce7f3', text:'#9d174d', icon:'bi-heart'}];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const key = slugify(categoryName) || ('kategori-' + Date.now());
-
-        const current = loadCustomCategories();
-        const exists = current.some(c => c.key === key || c.label.toLowerCase() === categoryName.toLowerCase());
-        if (!exists) {
-            current.push({ key, label: categoryName, bg: color.bg, text: color.text, icon: color.icon });
-            saveCustomCategories(current);
+        if (!categoryName) {
+            if (window.showToast) window.showToast('Mohon isi nama kategori.', 'error');
+            return;
         }
 
-        loadCategoryOptionsFromStorage();
+        const warna = (document.getElementById('newCategoryColor')?.value || '').trim();
+
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        fetch("{{ route('categories.store') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({ nama_kategori: categoryName, warna }),
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal menyimpan kategori');
+                return response.json();
+            })
+            .then(data => {
+                if (!data || !data.success || !data.category) throw new Error('Response tidak valid');
+
+                const hint = document.getElementById('emptyCategoryHint');
+                if (hint) hint.remove();
+
+                addCategoryOptionToHome(data.category);
+
+                const newInputId = 'categoryDb_' + data.category.kategori_id;
+                const newRadio = document.getElementById(newInputId);
+                if (newRadio) newRadio.checked = true;
+
+                document.getElementById('newCategoryName').value = '';
+                const colorEl = document.getElementById('newCategoryColor');
+                if (colorEl) colorEl.value = 'biru';
+                document.getElementById('addCategoryForm').classList.add('d-none');
+            })
+            .catch(() => {
+                if (window.showToast) window.showToast('Gagal menambahkan kategori. Silakan coba lagi.', 'error');
+            });
+    }
+
+    function cancelAddCategory() {
         document.getElementById('newCategoryName').value = '';
+        const colorEl = document.getElementById('newCategoryColor');
+        if (colorEl) colorEl.value = 'biru';
         document.getElementById('addCategoryForm').classList.add('d-none');
+    }
+
+    function createCategoryIfNeeded(csrfToken) {
+        const addCategoryForm = document.getElementById('addCategoryForm');
+        const isFormVisible = addCategoryForm && !addCategoryForm.classList.contains('d-none');
+        if (!isFormVisible) return Promise.resolve(null);
+
+        const categoryName = document.getElementById('newCategoryName')?.value?.trim() || '';
+        const warna = (document.getElementById('newCategoryColor')?.value || '').trim();
+        if (!categoryName) return Promise.resolve(null);
+
+        return fetch("{{ route('categories.store') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({ nama_kategori: categoryName, warna }),
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal menyimpan kategori');
+                return response.json();
+            })
+            .then(data => {
+                if (!data || !data.success || !data.category) throw new Error('Response tidak valid');
+
+                const hint = document.getElementById('emptyCategoryHint');
+                if (hint) hint.remove();
+
+                addCategoryOptionToHome(data.category);
+                const newInputId = 'categoryDb_' + data.category.kategori_id;
+                const newRadio = document.getElementById(newInputId);
+                if (newRadio) newRadio.checked = true;
+
+                document.getElementById('newCategoryName').value = '';
+                const colorEl = document.getElementById('newCategoryColor');
+                if (colorEl) colorEl.value = 'biru';
+                document.getElementById('addCategoryForm').classList.add('d-none');
+
+                return data.category.kategori_id;
+            });
+    }
+
+    // ============================
+    // 5. TOGGLE STATUS FUNCTION
+    // ============================
+    function toggleTaskStatus(checkbox, date, index) {
+        const taskId = checkbox.getAttribute('data-task-id');
+        if (!taskId) {
+            if (window.showToast) window.showToast('Tugas ini belum tersimpan di database.', 'error');
+            checkbox.checked = !checkbox.checked; // Revert
+            return;
+        }
+
+        const newStatus = checkbox.checked ? 'selesai' : null;
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        // Update UI immediately for better UX
+        const taskItem = checkbox.closest('.task-item-modal-wrapper');
+        const titleElement = taskItem.querySelector('h6');
+        if (checkbox.checked) {
+            titleElement.classList.add('task-completed');
+        } else {
+            titleElement.classList.remove('task-completed');
+        }
+
+        // Update database
+        fetch(`/rencana/${taskId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({ status: newStatus }),
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal mengubah status');
+                return response.json();
+            })
+            .then(() => {
+                // Update local tasksData
+                if (tasksData[date] && tasksData[date][index]) {
+                    tasksData[date][index].status = newStatus;
+                }
+                
+                // Update stats
+                updateStats();
+                
+                // Dispatch event untuk update sidebar stats
+                window.dispatchEvent(new Event('storage'));
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (window.showToast) window.showToast('Gagal mengubah status tugas. Silakan coba lagi.', 'error');
+                
+                // Revert UI on error
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    titleElement.classList.add('task-completed');
+                } else {
+                    titleElement.classList.remove('task-completed');
+                }
+            });
+    }
+
+    // ============================
+    // 6. DELETE TASK LOGIC (UPDATED)
+    // ============================
+    
+    // ============================
+    // 6. DELETE TASK LOGIC (FIXED)
+    // ============================
+    
+    let taskToDelete = null; 
+
+    function konfirmasiHapusTugas(taskId, date, index) {
+        taskToDelete = { taskId, date, index };
+        const el = document.getElementById('deleteConfirmationModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(el);
+        // Ensure z-index is higher than taskDetailModal if needed, but Bootstrap handles stacking usually.
+        modal.show();
+    }
+
+    // Attach listener for the delete button
+    // We use a self-executing function or just place it here to run when script executes
+    (function setupDeleteListener() {
+        const btn = document.getElementById('confirmDeleteBtn');
+        if (btn) {
+            // Remove old listener if any to avoid duplicates (clone node trick or just assume unique)
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', () => {
+                if (taskToDelete) {
+                    prosesHapusTugas(taskToDelete.taskId, taskToDelete.date, taskToDelete.index);
+                    const el = document.getElementById('deleteConfirmationModal');
+                    const modal = bootstrap.Modal.getInstance(el);
+                    if (modal) modal.hide();
+                }
+            });
+        }
+    })();
+
+    function prosesHapusTugas(taskId, date, index) {
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
+        fetch(`/rencana/${taskId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal menghapus rencana');
+                return response.json();
+            })
+            .then(() => {
+                // 1. Update data lokal
+                const currentTasks = tasksData[date];
+                if (currentTasks) {
+                    currentTasks.splice(index, 1);
+                    // 2. Update tampilan List (tanpa re-open modal)
+                    renderTaskDetailList(date, currentTasks);
+                }
+
+                // 3. Notifikasi Toast
+                if (typeof showToast === 'function') {
+                    showToast('Rencana berhasil dihapus.', 'success');
+                } else if (window.showToast) {
+                    window.showToast('Rencana berhasil dihapus.', 'success');
+                } else {
+                    // Fallback manual toast trigger
+                    const toastEl = document.getElementById('successToast');
+                    if (toastEl) {
+                        const toast = new bootstrap.Toast(toastEl);
+                        toast.show();
+                    }
+                }
+
+                // 4. Update Stats & Calendar Dots
+                updateStats();
+                renderCalendar();
+                window.dispatchEvent(new Event('storage'));
+            })
+            .catch(error => {
+                console.error(error);
+                if (window.showToast) window.showToast('Gagal menghapus rencana.', 'error');
+            });
     }
 </script>
 @endpush

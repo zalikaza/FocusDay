@@ -55,7 +55,9 @@ Route::get('/', function (Request $request) {
                 'rencana.waktu',
                 'rencana.tanggal',
                 'rencana.status',
-                'kategori.nama_kategori'
+                'rencana.catatan',
+                'kategori.nama_kategori',
+                'kategori.warna'
             )
             ->get();
 
@@ -72,7 +74,9 @@ Route::get('/', function (Request $request) {
                 'rencana.waktu',
                 'rencana.tanggal',
                 'rencana.status',
-                'kategori.nama_kategori'
+                'rencana.catatan',
+                'kategori.nama_kategori',
+                'kategori.warna'
             )
             ->get();
 
@@ -156,8 +160,45 @@ Route::get('/calendar', function (Request $request) {
 })->name('calendar');
 
 // All Tasks Page - Semua Tugas
-Route::get('/tasks', function () {
-    return view('tasks.all');
+Route::get('/tasks', function (Request $request) {
+    if (!$request->session()->has('user')) {
+        return redirect()->route('login');
+    }
+
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return redirect()->route('login');
+    }
+
+    $tasks = DB::table('rencana')
+        ->leftJoin('kategori', 'rencana.kategori_id', '=', 'kategori.kategori_id')
+        ->where('rencana.user_id', $userId)
+        ->orderBy('rencana.tanggal')
+        ->orderBy('rencana.waktu')
+        ->select(
+            'rencana.rencana_id as id',
+            'rencana.judul_tugas',
+            'rencana.waktu',
+            'rencana.tanggal',
+            'rencana.status',
+            'rencana.catatan',
+            'rencana.kategori_id',
+            'kategori.nama_kategori',
+            'kategori.warna'
+        )
+        ->get();
+
+    $categories = DB::table('kategori')
+        ->where('user_id', $userId)
+        ->orderBy('nama_kategori')
+        ->get();
+
+    return view('tasks.all', [
+        'tasks' => $tasks,
+        'categories' => $categories,
+    ]);
 })->name('tasks.all');
 
 // Simpan rencana baru dari modal Tambah Rencana
@@ -213,6 +254,89 @@ Route::post('/rencana/status', function (Request $request) {
     return response()->json(['success' => true]);
 })->name('rencana.updateStatus');
 
+// Toggle status rencana (untuk checkbox di modal kalender)
+Route::post('/rencana/{id}/toggle-status', function (Request $request, $id) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return response()->json(['message' => 'Unauthenticated'], 401);
+    }
+
+    $data = $request->validate([
+        'status' => ['nullable', 'string'],
+    ]);
+
+    $updated = DB::table('rencana')
+        ->where('rencana_id', (int) $id)
+        ->where('user_id', $userId)
+        ->update([
+            'status' => $data['status'],
+        ]);
+
+    if (!$updated) {
+        return response()->json(['message' => 'Not Found'], 404);
+    }
+
+    return response()->json(['success' => true]);
+})->name('rencana.toggleStatus');
+
+// Update rencana (dipakai dari modal edit di Kalender)
+Route::post('/rencana/{id}', function (Request $request, $id) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return response()->json(['message' => 'Unauthenticated'], 401);
+    }
+
+    $data = $request->validate([
+        'judul_tugas' => ['required', 'string'],
+        'kategori_id' => ['nullable', 'integer'],
+        'tanggal'     => ['required', 'date'],
+        'waktu'       => ['nullable', 'string'],
+        'catatan'     => ['nullable', 'string'],
+    ]);
+
+    $updated = DB::table('rencana')
+        ->where('rencana_id', (int) $id)
+        ->where('user_id', $userId)
+        ->update([
+            'judul_tugas' => $data['judul_tugas'],
+            'kategori_id' => $data['kategori_id'] ?? null,
+            'tanggal'     => $data['tanggal'],
+            'waktu'       => $data['waktu'] ?? null,
+            'catatan'     => $data['catatan'] ?? null,
+        ]);
+
+    if (!$updated) {
+        return response()->json(['message' => 'Not Found'], 404);
+    }
+
+    return response()->json(['success' => true]);
+})->where('id', '[0-9]+')->name('rencana.update');
+
+// Hapus rencana
+Route::delete('/rencana/{id}/delete', function (Request $request, $id) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return response()->json(['message' => 'Unauthenticated'], 401);
+    }
+
+    $deleted = DB::table('rencana')
+        ->where('rencana_id', (int) $id)
+        ->where('user_id', $userId)
+        ->delete();
+
+    if (!$deleted) {
+        return response()->json(['message' => 'Not Found or not authorized'], 404);
+    }
+
+    return response()->json(['success' => true]);
+})->name('rencana.delete');
+
 // Tambah kategori baru (dipakai dari modal di Beranda)
 Route::post('/kategori', function (Request $request) {
     $sessionUser = $request->session()->get('user');
@@ -244,8 +368,41 @@ Route::post('/kategori', function (Request $request) {
 })->name('categories.store');
 
 // Categories Page - Kategori
-Route::get('/categories', function () {
-    return view('categories');
+Route::get('/categories', function (Request $request) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return redirect()->route('login');
+    }
+
+    $tasks = DB::table('rencana')
+        ->leftJoin('kategori', 'rencana.kategori_id', '=', 'kategori.kategori_id')
+        ->where('rencana.user_id', $userId)
+        ->orderBy('rencana.tanggal')
+        ->orderBy('rencana.waktu')
+        ->select(
+            'rencana.rencana_id as id',
+            'rencana.judul_tugas',
+            'rencana.tanggal',
+            'rencana.waktu',
+            'rencana.status',
+            'rencana.catatan',
+            'rencana.kategori_id',
+            'kategori.nama_kategori',
+            'kategori.warna'
+        )
+        ->get();
+
+    $categories = DB::table('kategori')
+        ->where('user_id', $userId)
+        ->orderBy('nama_kategori')
+        ->get();
+
+    return view('categories', [
+        'tasks' => $tasks,
+        'categories' => $categories,
+    ]);
 })->name('categories');
 
 // Settings Page - Pengaturan
@@ -253,7 +410,13 @@ Route::get('/settings', function (Request $request) {
     $sessionUser = $request->session()->get('user');
     $userId = $sessionUser['id'] ?? null;
 
-    $user = $userId ? User::find($userId) : null;
+    if (!$userId) {
+        return redirect()->route('login');
+    }
+
+    $user = $userId
+        ? DB::table('user')->where('user_id', (int) $userId)->first()
+        : null;
 
     return view('settings', [
         'user' => $user,
@@ -269,26 +432,104 @@ Route::post('/settings/profile', function (Request $request) {
         return redirect()->route('login');
     }
 
-    $user = User::findOrFail($userId);
+    $user = DB::table('user')->where('user_id', (int) $userId)->first();
+    if (!$user) {
+        return redirect()->route('login');
+    }
 
     $validated = $request->validate([
-        'name'  => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+        'username'  => ['required', 'string', 'max:255', 'unique:user,username,' . (int) $userId . ',user_id'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:user,email,' . (int) $userId . ',user_id'],
     ]);
 
-    $user->update($validated);
+    DB::table('user')
+        ->where('user_id', (int) $userId)
+        ->update([
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+        ]);
 
     // Update juga data di session agar header menampilkan nilai terbaru
     $request->session()->put('user', [
-        'id'    => $user->id,
-        'name'  => $user->name,
-        'email' => $user->email,
+        'id'    => (int) $userId,
+        'name'  => $validated['username'],
+        'email' => $validated['email'],
+        'username' => $validated['username'],
     ]);
 
     return back()->with('success', 'Profil berhasil diperbarui.');
 })->name('settings.profile.update');
 
-// Update password
+Route::post('/settings/profile/photo', function (Request $request) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return redirect()->route('login');
+    }
+
+    $user = DB::table('user')->where('user_id', (int) $userId)->first();
+    if (!$user) {
+        return redirect()->route('login');
+    }
+
+    $data = $request->validate([
+        'profile_photo' => ['required', 'image', 'max:2048'],
+    ]);
+
+    $file = $data['profile_photo'];
+    $dir = public_path('uploads/profile');
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+
+    $ext = $file->getClientOriginalExtension() ?: 'jpg';
+    $filename = 'user_' . (int) $userId . '_' . uniqid() . '.' . $ext;
+    $file->move($dir, $filename);
+
+    $relativePath = 'uploads/profile/' . $filename;
+
+    DB::table('user')
+        ->where('user_id', (int) $userId)
+        ->update([
+            'profile' => $relativePath,
+        ]);
+
+    return back()->with('success', 'Foto profil berhasil diperbarui.');
+})->name('settings.profile.photo.update');
+
+Route::post('/settings/profile/photo/delete', function (Request $request) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return redirect()->route('login');
+    }
+
+    $user = DB::table('user')->where('user_id', (int) $userId)->first();
+    if (!$user) {
+        return redirect()->route('login');
+    }
+
+    $profilePath = (string)($user->profile ?? '');
+
+    if (!empty($profilePath) && str_starts_with($profilePath, 'uploads/profile/')) {
+        $fullPath = public_path($profilePath);
+        if (is_file($fullPath)) {
+            @unlink($fullPath);
+        }
+    }
+
+    DB::table('user')
+        ->where('user_id', (int) $userId)
+        ->update([
+            'profile' => null,
+        ]);
+
+    return back()->with('success', 'Foto profil berhasil dihapus.');
+})->name('settings.profile.photo.delete');
+
+// Update password (plain text)
 Route::post('/settings/password', function (Request $request) {
     $sessionUser = $request->session()->get('user');
     $userId = $sessionUser['id'] ?? null;
@@ -297,22 +538,55 @@ Route::post('/settings/password', function (Request $request) {
         return redirect()->route('login');
     }
 
-    $user = User::findOrFail($userId);
+    $user = DB::table('user')->where('user_id', (int) $userId)->first();
+    if (!$user) {
+        return redirect()->route('login');
+    }
+
+    $storedPassword = (string) ($user->password ?? '');
 
     $validated = $request->validate([
         'current_password' => ['required'],
         'password' => ['required', 'string', 'min:8', 'confirmed'],
     ]);
 
-    if (!Hash::check($validated['current_password'], $user->password)) {
+    $currentOk = hash_equals($storedPassword, (string) $validated['current_password']);
+
+    if (!$currentOk) {
         return back()->withErrors(['current_password' => 'Password lama tidak sesuai.']);
     }
 
-    $user->password = Hash::make($validated['password']);
-    $user->save();
+    DB::table('user')
+        ->where('user_id', (int) $userId)
+        ->update([
+            'password' => (string) $validated['password'],
+        ]);
 
     return back()->with('success', 'Password berhasil diperbarui.');
 })->name('settings.password.update');
+
+Route::post('/settings/password/check-current', function (Request $request) {
+    $sessionUser = $request->session()->get('user');
+    $userId = $sessionUser['id'] ?? null;
+
+    if (!$userId) {
+        return response()->json(['ok' => false], 401);
+    }
+
+    $validated = $request->validate([
+        'current_password' => ['required', 'string'],
+    ]);
+
+    $user = DB::table('user')->where('user_id', (int) $userId)->first();
+    if (!$user) {
+        return response()->json(['ok' => false], 401);
+    }
+
+    $storedPassword = (string) ($user->password ?? '');
+    $currentOk = hash_equals($storedPassword, (string) $validated['current_password']);
+
+    return response()->json(['ok' => (bool) $currentOk]);
+})->name('settings.password.check');
 
 // Update preferensi tampilan (tema & hari awal minggu)
 Route::post('/settings/preferences', function (Request $request) {
@@ -323,26 +597,12 @@ Route::post('/settings/preferences', function (Request $request) {
         return redirect()->route('login');
     }
 
-    $user = User::findOrFail($userId);
-
-    $data = $request->validate([
+    // Table `user` saat ini belum menyimpan preferensi (theme/week_start) secara permanen.
+    // Tetap validasi agar request rapi, tapi tidak mengubah DB.
+    $request->validate([
         'theme' => ['nullable', 'in:light,dark'],
         'week_start' => ['nullable', 'in:0,1'],
     ]);
-
-    // Jika kolom-kolom ini ada di tabel users, update nilainya
-    $update = [];
-    if (array_key_exists('theme', $data)) {
-        $update['theme'] = $data['theme'];
-    }
-    if (array_key_exists('week_start', $data)) {
-        $update['week_start'] = (int) $data['week_start'];
-    }
-
-    if (!empty($update)) {
-        $user->fill($update);
-        $user->save();
-    }
 
     return back()->with('success', 'Preferensi tampilan berhasil disimpan.');
 })->name('settings.preferences.update');
@@ -361,7 +621,7 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-// Login Submit - autentikasi langsung ke tabel `user` (user_id, username, email, password plain text)
+// Login Submit - autentikasi langsung ke tabel `user` (password plain text)
 Route::post('/login', function (Request $request) {
     $credentials = $request->validate([
         'username' => ['required', 'string'],
@@ -370,22 +630,30 @@ Route::post('/login', function (Request $request) {
 
     $login = $credentials['username'];
 
-    // Pakai Query Builder ke tabel `user` (bukan model User bawaan Laravel)
     $user = DB::table('user')
         ->where('username', $login)
         ->orWhere('email', $login)
         ->first();
 
-    if (!$user || $user->password !== $credentials['password']) {
+    if (!$user) {
         return back()
             ->withErrors(['login' => 'Username atau password tidak sesuai.'])
             ->withInput($request->only('username'));
     }
 
-    // Simpan ke session persis dari kolom di tabel `user`
+    $storedPassword = (string) ($user->password ?? '');
+    $passwordOk = hash_equals($storedPassword, (string) $credentials['password']);
+
+    if (!$passwordOk) {
+        return back()
+            ->withErrors(['login' => 'Username atau password tidak sesuai.'])
+            ->withInput($request->only('username'));
+    }
+
     $request->session()->put('user', [
         'id'    => $user->user_id,
         'name'  => $user->username,
+        'username' => $user->username,
         'email' => $user->email,
     ]);
 
@@ -399,14 +667,18 @@ Route::get('/register', function () {
 
 Route::post('/register', function (Request $request) {
     $validated = $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+        'username' => ['required', 'string', 'max:255', 'unique:user,username'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:user,email'],
         'password' => ['required', 'string', 'min:8', 'confirmed'],
     ], [
         'password.confirmed' => 'Konfirmasi password tidak sesuai.',
     ]);
 
-    User::create($validated);
+    DB::table('user')->insert([
+        'username' => $validated['username'],
+        'email' => $validated['email'],
+        'password' => (string) $validated['password'],
+    ]);
 
     return redirect()->route('login')->with('success', 'Akun berhasil dibuat. Silakan masuk.');
 })->name('register.store');
