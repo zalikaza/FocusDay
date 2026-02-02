@@ -100,11 +100,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.25rem;
-            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
             flex-shrink: 0;
+        }
+
+        .logo-icon-img {
+            width: 22px;
+            height: 22px;
+            display: block;
         }
 
         .logo-text {
@@ -300,6 +303,33 @@
             background: var(--sidebar-hover);
         }
 
+        .profile-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            font-weight: 700;
+            font-size: 0.85rem;
+            overflow: hidden;
+            flex: 0 0 auto;
+        }
+
+        html[data-theme="dark"] .profile-avatar {
+            background: rgba(16, 185, 129, 0.18);
+            color: #34d399;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
         /* --- Main Content --- */
         .main-content {
             margin-left: var(--sidebar-width);
@@ -479,6 +509,12 @@
         html[data-theme="dark"] .form-select {
             background-color: rgba(255, 255, 255, 0.03);
             border-color: #1f2937;
+            color: #e2e8f0;
+        }
+
+        html[data-theme="dark"] .form-select option,
+        html[data-theme="dark"] .form-select optgroup {
+            background-color: #0f172a;
             color: #e2e8f0;
         }
 
@@ -809,10 +845,7 @@
         <div class="sidebar-logo">
             <a href="{{ route('home') }}" class="logo-wrapper">
                 <div class="logo-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 6V3C8 2.44772 8.44772 2 9 2H15C15.5523 2 16 2.44772 16 3V6H19C19.5523 6 20 6.44772 20 7V20C20 20.5523 19.5523 21 19 21H5C4.44772 21 4 20.5523 4 20V7C4 6.44772 4.44772 6 5 6H8ZM10 6H14V4H10V6Z" fill="white"/>
-                        <path d="M12 10C11.4477 10 11 10.4477 11 11V13C11 13.5523 11.4477 14 12 14C12.5523 14 13 13.5523 13 13V11C13 10.4477 12.5523 10 12 10Z" fill="white"/>
-                    </svg>
+                    <img class="logo-icon-img" src="{{ asset('favicon.svg') }}" alt="{{ config('app.name', 'FocusDay') }}" />
                 </div>
                 <h1 class="logo-text">FocusDay</h1>
             </a>
@@ -839,7 +872,7 @@
                         <a href="{{ route('calendar') }}" class="nav-link {{ request()->routeIs('calendar') ? 'active' : '' }}">
                             <span class="nav-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8 2V6M16 2V6M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 20.5523 20.1046 21 19 21H5C3.89543 21 3 20.5523 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 2V6M16 2V6M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 20.5523 20.1046 21 19 21H5C3.89543 21 3 20.5523 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                 </svg>
                             </span>
                             <span class="nav-text">Kalender</span>
@@ -937,10 +970,20 @@
                             $displayName = $sessionUser['name'] ?? $sessionUser['email'] ?? 'Pengguna';
                             $displayEmail = $sessionUser['email'] ?? 'user@example.com';
                             $initials = strtoupper(substr($displayName, 0, 2));
+
+                            $profilePath = null;
+                            $sessionUserId = $sessionUser['id'] ?? null;
+                            if ($sessionUserId) {
+                                $profilePath = DB::table('user')->where('user_id', (int) $sessionUserId)->value('profile');
+                            }
                         @endphp
                         <button class="profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <span class="profile-avatar">
-                                {{ $initials }}
+                                @if (!empty($profilePath))
+                                    <img src="{{ asset($profilePath) }}" alt="Profile">
+                                @else
+                                    {{ $initials }}
+                                @endif
                             </span>
                             <span class="profile-meta text-start">
                                 <span class="d-block" style="font-weight: 600; font-size: 0.875rem; line-height: 1.1;">
@@ -969,12 +1012,69 @@
         </main>
     </div>
     
+    <!-- Global Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+        <div id="globalToast" class="toast align-items-center text-white border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-3">
+                    <i id="globalToastIcon" class="bi bi-check-circle-fill fs-4"></i>
+                    <div>
+                        <strong class="d-block" id="globalToastTitle">Sukses!</strong>
+                        <span class="small opacity-75" id="globalToastMessage">Berhasil.</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Layout Logic -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // ========================
+        // GLOBAL TOAST LOGIC
+        // ========================
+        const toastEl = document.getElementById('globalToast');
+        const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+        const toastTitle = document.getElementById('globalToastTitle');
+        const toastMessage = document.getElementById('globalToastMessage');
+        const toastIcon = document.getElementById('globalToastIcon');
+
+        function showGlobalToast(message, type = 'success', title = null) {
+            if (type === 'success') {
+                toastEl.className = 'toast align-items-center text-white border-0 shadow-lg bg-success';
+                toastEl.style.backgroundColor = '#10b981'; // Tailwind emerald-500
+                toastIcon.className = 'bi bi-check-circle-fill fs-4';
+                toastTitle.textContent = title || 'Berhasil!';
+            } else if (type === 'error') {
+                toastEl.className = 'toast align-items-center text-white border-0 shadow-lg bg-danger';
+                toastIcon.className = 'bi bi-x-circle-fill fs-4';
+                toastTitle.textContent = title || 'Gagal!';
+            } else {
+                toastEl.className = 'toast align-items-center text-white border-0 shadow-lg bg-primary';
+                toastIcon.className = 'bi bi-info-circle-fill fs-4';
+                toastTitle.textContent = title || 'Info';
+            }
+            
+            toastMessage.textContent = message;
+            toast.show();
+        }
+
+        // Expose to window for manual calls
+        window.showToast = showGlobalToast;
+
+        // Auto-show flash messages
+        @if(session('success'))
+            showGlobalToast("{{ session('success') }}", 'success');
+        @endif
+
+        @if($errors->any())
+            showGlobalToast("Terjadi kesalahan. Periksa input Anda.", 'error');
+        @endif
+
     const themeToggle = document.getElementById('themeToggle');
 
     if (themeToggle) {
